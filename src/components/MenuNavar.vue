@@ -9,7 +9,7 @@
       </v-list-item>
       <div id="avatar-menu">
         <img
-          v-if="user.avatar"
+          v-if="user.avatar.length > 0"
           :src="user.avatar"
           :style="mini ? { width: '50px' } : { width: '100px' }"
         />
