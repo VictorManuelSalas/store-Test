@@ -56,11 +56,11 @@
                 color="primary"
                 large
                 :disabled="!valid"
-                @click="logIn(email, password)"
+                @click="logInProcess(email, password)"
               >
                 Log in
               </v-btn>
-              <v-btn
+              <!-- <v-btn
                 block
                 color="primary"
                 large
@@ -69,7 +69,7 @@
                 @click="$router.push('/signup')"
               >
                 Sign up
-              </v-btn>
+              </v-btn> -->
             </div>
           </v-col>
         </v-row>
@@ -79,7 +79,8 @@
 </template>
 
 <script>
-import logIn from "../helpers/LogIn";
+import { logIn } from "../helpers/Auth";
+import { getUserByEmail } from "../helpers/UserQuery";
 export default {
   data: () => ({
     loading: false,
@@ -101,7 +102,7 @@ export default {
     ],
   }),
   methods: {
-    async logIn(email, password) {
+    async logInProcess(email, password) {
       this.loading = true;
       const loginResponse = await logIn(email, password);
 
@@ -121,16 +122,28 @@ export default {
         return;
       }
 
-      localStorage.setItem(
-        "token",
-        JSON.stringify(loginResponse?.stsTokenManager)
-      );
-      localStorage.setItem("email", loginResponse?.email);
-      setTimeout(() => {
+      const user = await this.getUserInfo(loginResponse?.email);
+      if (user) {
+        this.$store.commit("setUser", {
+          auth: loginResponse,
+          ...user,
+        });
+        this.$store.dispatch("updateItems", user.role);
         this.loading = false;
-        console.log(loginResponse);
-        this.$router.push("/home");
-      }, 2000);
+        this.$router.push(user.role === "admin" ? "/admin/home" : "/home");
+      }
+    },
+    async getUserInfo(email) {
+      const userData = await getUserByEmail(email); 
+      if (userData.length === 0) {
+        this.loading = false;
+        this.alert = {
+          value: true,
+          text: "User not found, please verify the information",
+        };
+        return null;
+      }
+      return userData[0];
     },
   },
 };

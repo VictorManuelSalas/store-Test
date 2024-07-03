@@ -1,5 +1,5 @@
 <template>
-  <v-app>
+  <v-app> 
     <v-main>
       <router-view />
     </v-main>
@@ -19,7 +19,6 @@ export default {
 </script>
 
 <style scoped>
-#app{
-  padding: 0rem 1rem; 
+#app{ 
 }
 </style>

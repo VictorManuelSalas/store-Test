@@ -253,10 +253,10 @@
 
 <script>
 import sendTemplatePasswordResetEmail from "../helpers/SendTemplatesAuth";
-import getUserByEmail from "../helpers/GetUserByEmail";
-import handleResetPassword from "../helpers/ChangePassword";
-import handleVerifyEmail from "../helpers/VerifyEmail";
-// import updateUser from "../helpers/UpdateUser";
+import { getUserByEmail } from "../helpers/UserQuery";
+import { handleResetPassword } from "../helpers/Auth";
+import { handleVerifyEmail } from "../helpers/Auth";
+
 export default {
   data: () => ({
     show1: false,
@@ -313,7 +313,7 @@ export default {
       return false;
     },
   },
-  mounted() {  },
+  mounted() {},
   methods: {
     async sendEmail() {
       this.loading = true;

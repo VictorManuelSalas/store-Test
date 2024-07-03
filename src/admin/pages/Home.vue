@@ -1,7 +1,12 @@
 <template>
   <Loader v-if="loader" />
   <main v-else>
-    <MenuNavar></MenuNavar>
+    <MenuNavar
+      :user="{
+        name: `${user.firstname} ${user.lastname}`,
+        avatar: user.avatar,
+      }"
+    />
     <section>
       <HeaderSection />
       <router-view />
@@ -24,6 +29,11 @@ export default {
       loader: true,
     };
   },
+  computed: {
+    user() {
+      return this.$store.getters.getUser;
+    },
+  },
   mounted() {
     console.log("userValue", this.user);
     if (!this.user) {
@@ -41,5 +51,12 @@ export default {
 main {
   display: flex;
   height: 100vh;
+
+  section { 
+    width: clamp(60%, 100%, 100%); 
+    height: 100vh;
+    padding-bottom: 1rem;
+    overflow: auto;
+  }
 }
 </style>

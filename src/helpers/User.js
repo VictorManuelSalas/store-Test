@@ -3,7 +3,11 @@ import {
   collection,
   addDoc,
   Timestamp,
+  doc,
+  setDoc,
+  deleteDoc,
 } from "firebase/firestore";
+
 import {
   getStorage,
   ref,
@@ -11,8 +15,10 @@ import {
   getDownloadURL,
 } from "firebase/storage";
 
+const db = getFirestore();
+
+//Create User
 const createUser = async (data) => {
-  const db = getFirestore();
   try {
     console.log(data.avatar);
     console.log(typeof data.avatar);
@@ -32,7 +38,30 @@ const createUser = async (data) => {
     });
     return { id: docRef.id, status: true };
   } catch (e) {
-    console.error("Error adding document: ", e);
+    console.error("Error adding user: ", e);
+    return e.message;
+  }
+};
+
+//Update User
+const updateUser = async (data) => {
+  try {
+    const docRef = await setDoc(doc(db, "users", "LA"), data);
+    console.log(docRef);
+    return docRef;
+  } catch (e) {
+    console.error("Error update document: ", e);
+    return e.message;
+  }
+};
+
+//delete User
+const deleteUser = async (id) => {
+  try {
+    await deleteDoc(doc(db, "users", id));
+    return 200;
+  } catch (e) {
+    console.error("Error update document: ", e);
     return e.message;
   }
 };
@@ -70,4 +99,4 @@ const uploadImage = async (file) => {
   });
 };
 
-export default createUser;
+export { createUser, updateUser, deleteUser };

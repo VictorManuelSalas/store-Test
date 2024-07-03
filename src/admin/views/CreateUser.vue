@@ -6,6 +6,7 @@
       :value="alert.value"
       transition="scale-transition"
       icon="mdi-account-check"
+      id="alert"
     >
       <v-row align="center">
         <v-col class="grow">
@@ -14,7 +15,9 @@
         <v-col class="shrink">
           <v-btn
             @click="
-              alert.method == 'info' ? $router.push('/') : (alert.value = false)
+              alert.method == 'info'
+                ? $router.push('/admin/home/admin')
+                : (alert.value = false)
             "
           >
             Understand
@@ -22,90 +25,103 @@
         </v-col>
       </v-row>
     </v-alert>
-    <v-card :loading="loading" class="mx-auto my-12">
+    <v-card id="card" :loading="loading">
       <template slot="progress">
         <v-progress-linear height="5" indeterminate></v-progress-linear>
       </template>
 
-      <v-img height="150" src="../assets/backgroun2.jpg"></v-img>
+      <v-img height="100" src="../../assets/backgroun2.jpg"></v-img>
 
       <v-card-title class="pl-6">
-        <h2>Sign Up</h2>
+        <h2>Create new user</h2>
       </v-card-title>
       <v-card-text class="pl-0 pr-0">
-        <v-form v-model="valid">
-          <v-container>
-            <v-row>
-              <v-col cols="12" md="6" ms="4">
-                <v-text-field
-                  v-model="data.accoundID"
-                  :rules="accountIDRule"
-                  label="Account ID"
-                  required
-                  filled
-                ></v-text-field>
-              </v-col>
+        <v-form id="form" v-model="valid">
+          <v-row class="pl-6">
+            <v-col cols="12" md="6" ms="4">
+              <v-text-field
+                v-model="data.accoundID"
+                :rules="accountIDRule"
+                label="Account ID"
+                required
+                filled
+              ></v-text-field>
+            </v-col>
 
-              <v-col cols="12" md="6" ms="4">
-                <v-text-field
-                  v-model="data.firstname"
-                  :rules="nameRules"
-                  label="First name"
-                  required
-                  filled
-                ></v-text-field>
-              </v-col>
+            <v-col cols="12" md="6" ms="4">
+              <v-text-field
+                v-model="data.firstname"
+                :rules="nameRules"
+                label="First name"
+                required
+                filled
+              ></v-text-field>
+            </v-col>
 
-              <v-col cols="12" md="6" ms="4">
-                <v-text-field
-                  v-model="data.lastname"
-                  :rules="nameRules"
-                  label="Last name"
-                  required
-                  filled
-                ></v-text-field>
-              </v-col>
+            <v-col cols="12" md="6" ms="4">
+              <v-text-field
+                v-model="data.lastname"
+                :rules="nameRules"
+                label="Last name"
+                required
+                filled
+              ></v-text-field>
+            </v-col>
 
-              <v-col cols="12" md="6" ms="4">
-                <v-text-field
-                  v-model="data.email"
-                  :rules="emailRules"
-                  label="E-mail"
-                  required
-                  filled
-                ></v-text-field>
-              </v-col>
+            <v-col cols="12" md="6" ms="4">
+              <v-text-field
+                v-model="data.email"
+                :rules="emailRules"
+                label="E-mail"
+                required
+                filled
+              ></v-text-field>
+            </v-col>
 
-              <v-col cols="12" md="6" ms="4">
-                <v-file-input
-                  filled
-                  v-model="data.avatar"
-                  accept="image/png, image/jpeg"
-                  placeholder="Pick an avatar"
-                  prepend-icon="mdi-camera"
-                  label="Avatar"
-                ></v-file-input>
-              </v-col>
-              <v-col cols="12" md="6" ms="4">
-                <v-text-field
-                  filled
-                  v-model="data.phoneNumber"
-                  :counter="10"
-                  :rules="phoneRule"
-                  label="Phone Number"
-                  required
-                ></v-text-field>
-              </v-col>
-            </v-row>
-          </v-container>
+            <v-col cols="12" md="6" ms="4">
+              <v-text-field
+                filled
+                v-model="data.phoneNumber"
+                :counter="10"
+                :rules="phoneRule"
+                label="Phone Number"
+                required
+              ></v-text-field>
+            </v-col>
+            <v-col cols="12" md="6" ms="4">
+              <v-select
+                required
+                filled
+                :items="rolesValues"
+                label="Role"
+                v-model="data.role"
+              ></v-select>
+            </v-col>
+            <v-col cols="12" md="6" ms="4">
+              <v-file-input
+                filled
+                v-model="data.avatar"
+                accept="image/png, image/jpeg"
+                placeholder="Pick an avatar"
+                prepend-icon="mdi-camera"
+                label="Avatar"
+              ></v-file-input>
+            </v-col>
+          </v-row>
         </v-form>
       </v-card-text>
 
-      <v-container fluid class="pa-0">
+      <v-container fluid class="pl-6">
         <v-row align="center">
           <v-col cols="12" sm="12">
             <div id="btns_actions">
-              <v-btn color="warning" large dark text @click="$router.push('/admin/home/admin')">
+              <v-btn
+                color="warning"
+                large
+                dark
+                text
+                @click="$router.push('/admin/home/admin')"
+              >
                 Cancel
               </v-btn>
               <v-btn color="primary" large :disabled="!valid" @click="signUp()">
@@ -120,9 +136,9 @@
 </template>
 
 <script>
-import { createUser } from "../helpers/User";
-import { registerUserAndSendVerificationEmail } from "../helpers/Auth";
-// import getAdmins from "../helpers/GetAdmins";
+import { createUser } from "../../helpers/User";
+import { registerUserAndSendVerificationEmail } from "../../helpers/Auth";
+
 export default {
   data: () => ({
     loading: false,
@@ -133,6 +149,7 @@ export default {
       method: "",
     },
     valid: false,
+    rolesValues: ["admin", "client"],
     data: {
       accoundID: null,
       firstname: "",
@@ -141,6 +158,7 @@ export default {
       email: "",
       phoneNumber: "",
       avatar: [],
+      role: "",
     },
     nameRules: [
       (v) => !!v || "Name is required",
@@ -166,13 +184,13 @@ export default {
   methods: {
     async signUp() {
       this.loading = true;
-      const createUserResponse = await createUser(this.data);
 
-      if (createUserResponse.hasOwnProperty("id")) {
-        const responseCredentialsAuthCreated = await this.createUserAuth(
-          this.data.email
-        );
-        responseCredentialsAuthCreated
+      const responseCredentialsAuthCreated = await this.createUserAuth(
+        this.data.email
+      );
+      if (responseCredentialsAuthCreated) {
+        const createUserResponse = await createUser(this.data);
+        createUserResponse.hasOwnProperty("id")
           ? (this.alert.value = true)
           : (this.alert = {
               value: true,
@@ -184,7 +202,7 @@ export default {
           accoundID: null,
           firstname: "",
           lastname: "",
-          role: "client",
+          role: "",
           email: "",
           phoneNumber: "",
           avatar: [],
@@ -199,7 +217,8 @@ export default {
         email,
         newPassword
       );
-      console.log(newPassword, createUserAuths);
+      console.log(newPassword, createUserAuths.uid);
+      this.data.authID = createUserAuths.uid;
       if (createUserAuths.hasOwnProperty("email")) {
         this.alert = {
           value: false,
@@ -246,11 +265,21 @@ export default {
 <style lang="scss" scoped>
 div {
   margin: auto;
-  width: clamp(300px, 100%, 800px);
+  width: clamp(60%, 100%, 100%);
+  #card {
+    width: 95%;
+  }
 }
 #btns_actions {
   display: flex;
   gap: 10px;
   justify-content: flex-end;
+  padding: 0px 1rem;
+}
+
+#alert {
+  position: sticky;
+  top: 0px;
+  z-index: 200;
 }
 </style>
