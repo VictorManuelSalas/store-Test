@@ -39,6 +39,9 @@
                   :rules="passwordRules"
                   label="Password"
                   required
+                  :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
+                  :type="show1 ? 'text' : 'password'"
+                  @click:append="show1 = !show1"
                 ></v-text-field>
               </v-col>
             </v-row>
@@ -83,6 +86,7 @@ import { logIn } from "../helpers/Auth";
 import { getUserByEmail } from "../helpers/UserQuery";
 export default {
   data: () => ({
+    show1: false,
     loading: false,
     selection: 1,
     valid: false,
@@ -124,17 +128,20 @@ export default {
 
       const user = await this.getUserInfo(loginResponse?.email);
       if (user) {
-        this.$store.commit("setUser", {
-          auth: loginResponse,
+        this.$store.dispatch("fetchUser", {
+          auth: {
+            token: loginResponse.stsTokenManager.accessToken,
+            refreshToken: loginResponse.stsTokenManager.refreshToken,
+          },
           ...user,
         });
         this.$store.dispatch("updateItems", user.role);
         this.loading = false;
-        this.$router.push(user.role === "admin" ? "/admin/home" : "/home");
+        this.$router.push("/home");
       }
     },
     async getUserInfo(email) {
-      const userData = await getUserByEmail(email); 
+      const userData = await getUserByEmail(email);
       if (userData.length === 0) {
         this.loading = false;
         this.alert = {

@@ -1,5 +1,5 @@
 <template>
- <div> This is services</div>
+ <div> This is profile</div>
 </template>
 
 <script>

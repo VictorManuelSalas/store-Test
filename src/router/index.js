@@ -31,6 +31,43 @@ const routes = [
       return import(/* webpackChunkName: "login" */ "../pages/SignUp.vue");
     },
   },
+  // {
+  //   path: "/home",
+  //   name: "home",
+  //   component: function () {
+  //     return import(/* webpackChunkName: "login" */ "../pages/Home.vue");
+  //   },
+  //   children: [
+  //     {
+  //       path: "/",
+  //       component: function () {
+  //         return import(/* webpackChunkName: "login" */ "../views/Home.vue");
+  //       },
+  //     },
+  //     {
+  //       path: "invoices",
+  //       component: function () {
+  //         return import(
+  //           /* webpackChunkName: "login" */ "../views/Invoices.vue"
+  //         );
+  //       },
+  //     },
+  //     {
+  //       path: "payments",
+  //       component: function () {
+  //         return import(
+  //           /* webpackChunkName: "login" */ "../views/Payments.vue"
+  //         );
+  //       },
+  //     },
+  //     {
+  //       path: "profile",
+  //       component: function () {
+  //         return import(/* webpackChunkName: "login" */ "../views/Profile.vue");
+  //       },
+  //     },
+  //   ],
+  // },
   {
     path: "/home",
     name: "home",
@@ -42,6 +79,12 @@ const routes = [
         path: "/",
         component: function () {
           return import(/* webpackChunkName: "login" */ "../views/Home.vue");
+        },
+      },
+      {
+        path: "profile",
+        component: function () {
+          return import(/* webpackChunkName: "login" */ "../views/Profile.vue");
         },
       },
       {
@@ -61,53 +104,6 @@ const routes = [
         },
       },
       {
-        path: "profile",
-        component: function () {
-          return import(/* webpackChunkName: "login" */ "../views/Profile.vue");
-        },
-      },
-    ],
-  },
-  {
-    path: "/admin/home",
-    name: "admin-home",
-    component: function () {
-      return import(/* webpackChunkName: "login" */ "../admin/pages/Home.vue");
-    },
-    children: [
-      {
-        path: "/",
-        component: function () {
-          return import(
-            /* webpackChunkName: "login" */ "../admin/views/Home.vue"
-          );
-        },
-      },
-      {
-        path: "profile",
-        component: function () {
-          return import(
-            /* webpackChunkName: "login" */ "../admin/views/Profile.vue"
-          );
-        },
-      },
-      {
-        path: "invoices",
-        component: function () {
-          return import(
-            /* webpackChunkName: "login" */ "../admin/views/Invoices.vue"
-          );
-        },
-      },
-      {
-        path: "payments",
-        component: function () {
-          return import(
-            /* webpackChunkName: "login" */ "../admin/views/Payments.vue"
-          );
-        },
-      },
-      {
         path: "admin",
         component: function () {
           return import(
@@ -122,6 +118,25 @@ const routes = [
             /* webpackChunkName: "login" */ "../admin/views/CreateUser.vue"
           );
         },
+      },
+      {
+        path: "user/:id",
+        component: function () {
+          return import(
+            /* webpackChunkName: "login" */ "../admin/views/ViewUser.vue"
+          );
+        },
+      },
+
+      {
+        path: "update-user",
+        name: "update-user",
+        component: function () {
+          return import(
+            /* webpackChunkName: "login" */ "../admin/views/UpdateUser.vue"
+          );
+        },
+        props: true,
       },
     ],
   },

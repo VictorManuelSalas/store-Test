@@ -337,7 +337,6 @@ export default {
         text: "Instructions to change your account password have been sent to your email.",
       };
 
-      console.log(sendEmailTempResponse);
       this.loading = false;
     },
     async getUserAccount() {
@@ -347,7 +346,6 @@ export default {
       if (clientData) {
         this.loading = false;
         this.users = clientData.length > 0 ? clientData : [false];
-        console.log(this.users);
       }
     },
 
@@ -364,11 +362,9 @@ export default {
           method: "info",
           text: "Password changed successfully.",
         };
-        console.log("respuestatrue", response);
         return;
       }
 
-      console.log("respuestafasle", response);
       this.alert = {
         value: true,
         method: "error",
@@ -387,11 +383,9 @@ export default {
           method: "info",
           text: "Thank you for verifying your email. We're excited to have you on board!",
         };
-        console.log("respuestatrue", response);
         return;
       }
 
-      console.log("respuestafasle", response);
       this.alert = {
         value: true,
         method: "error",

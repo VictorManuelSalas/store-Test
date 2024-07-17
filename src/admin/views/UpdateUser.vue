@@ -43,14 +43,38 @@
       </template>
 
       <v-card-title class="pl-6">
-        <h2>Create new user</h2>
+        <h2>Update user</h2>
       </v-card-title>
-      <v-card-text class="pl-0 pr-0">
+      <v-card-text class="pl-0 pr-0 pa-2">
         <v-form id="form" v-model="valid">
           <v-row class="pl-6">
+            <v-col cols="12" md="12" ms="12">
+              <div
+                v-if="typeof customerData.avatar === 'string'"
+                class="circular-image"
+                :style="{
+                  backgroundImage: `url(${customerData.avatar})`,
+                }"
+              ></div>
+              
+            </v-col>
+            <v-col cols="12" md="6" ms="4">
+              <v-file-input
+                filled
+                v-model="customerData.avatar"
+                accept="image/png, image/jpeg"
+                placeholder="Pick an avatar"
+                prepend-icon="mdi-camera"
+                :label="
+                  customerData.avatar !== null && customerData.avatar.length > 0
+                    ? customerData.avatar
+                    : 'Avatar'
+                "
+              ></v-file-input>
+            </v-col>
             <v-col cols="12" md="6" ms="4">
               <v-text-field
-                v-model="data.accoundID"
+                v-model="customerData.accoundID"
                 :rules="accountIDRule"
                 label="Account ID"
                 required
@@ -60,7 +84,7 @@
 
             <v-col cols="12" md="6" ms="4">
               <v-text-field
-                v-model="data.firstname"
+                v-model="customerData.firstname"
                 :rules="nameRules"
                 label="First name"
                 required
@@ -70,7 +94,7 @@
 
             <v-col cols="12" md="6" ms="4">
               <v-text-field
-                v-model="data.lastname"
+                v-model="customerData.lastname"
                 :rules="nameRules"
                 label="Last name"
                 required
@@ -80,7 +104,7 @@
 
             <v-col cols="12" md="6" ms="4">
               <v-text-field
-                v-model="data.email"
+                v-model="customerData.email"
                 :rules="emailRules"
                 label="E-mail"
                 required
@@ -91,7 +115,7 @@
             <v-col cols="12" md="6" ms="4">
               <v-text-field
                 filled
-                v-model="data.phoneNumber"
+                v-model="customerData.phoneNumber"
                 :counter="10"
                 :rules="phoneRule"
                 label="Phone Number"
@@ -104,18 +128,8 @@
                 filled
                 :items="rolesValues"
                 label="Role"
-                v-model="data.role"
+                v-model="customerData.role"
               ></v-select>
-            </v-col>
-            <v-col cols="12" md="6" ms="4">
-              <v-file-input
-                filled
-                v-model="data.avatar"
-                accept="image/png, image/jpeg"
-                placeholder="Pick an avatar"
-                prepend-icon="mdi-camera"
-                label="Avatar"
-              ></v-file-input>
             </v-col>
           </v-row>
         </v-form>
@@ -134,8 +148,13 @@
               >
                 Cancel
               </v-btn>
-              <v-btn color="primary" large :disabled="!valid" @click="signUp()">
-                Sign Up
+              <v-btn
+                color="primary"
+                large
+                :disabled="!valid"
+                @click="saveChanges()"
+              >
+                Save
               </v-btn>
             </div>
           </v-col>
@@ -146,14 +165,18 @@
 </template>
 
 <script>
-import { createUser } from "../../helpers/User";
-import { registerUserAndSendVerificationEmail } from "../../helpers/Auth";
+import { updateUser } from "../../helpers/User";
 import { getUserByEmail } from "../../helpers/UserQuery";
 
 export default {
+  props: {
+    customerData: {
+      type: Object,
+      default: {},
+    },
+  },
   data: () => ({
     loading: false,
-    selection: 1,
     alert: {
       value: false,
       text: "",
@@ -161,16 +184,7 @@ export default {
     },
     valid: false,
     rolesValues: ["admin", "client"],
-    data: {
-      accoundID: null,
-      firstname: "",
-      lastname: "",
-      role: "",
-      email: "",
-      phoneNumber: "",
-      avatar: [],
-      role: "",
-    },
+
     nameRules: [
       (v) => !!v || "Name is required",
       (v) => v.length >= 5 || "Name must be more than 5 characters",
@@ -189,13 +203,70 @@ export default {
       (v) => !!v || "Account ID is required",
       (v) => /^\d+$/.test(v) || "Account ID must contain only numbers",
     ],
+    emailCustomer: null,
+    imgCustomer: null,
   }),
+  computed: {},
 
   mounted() {
-    const { email, firstname, lastname } = this.$store.getters.getUser;
-    console.log(email, firstname, lastname);
+    this.emailCustomer = this.customerData.email;
+    this.imgCustomer = this.customerData.avatar;
   },
   methods: {
+    async saveChanges() {
+      this.loading = true;
+      const verifyEmailResp =
+        this.customerData.email !== this.emailCustomer
+          ? await this.verifyEmailCustomer()
+          : false;
+
+      if (verifyEmailResp) {
+        return;
+      }
+
+      const imgChanged =
+        this.customerData.avatar !== this.imgCustomer &&
+        this.imgCustomer.length !== 0
+          ? this.imgCustomer
+          : false;
+
+      const { email, firstname, lastname } = this.$store.getters.getUser;
+      console.log("data antes de enviar ", this.customerData);
+      const updateUserResponse = await updateUser(
+        this.customerData.id,
+        {
+          ...this.customerData,
+          modifiedBy: { email, name: `${firstname} ${lastname}` },
+        },
+        imgChanged,
+        ""
+      );
+      console.log(updateUserResponse);
+
+      this.loading = false;
+      if (updateUserResponse.status !== 200) {
+        this.alertProcess(updateUserResponse, "error");
+        return;
+      }
+      const emailLogUser = this.$store.getters.getUser.email;
+      this.emailCustomer === emailLogUser
+        ? this.$store.dispatch("fetchUser", updateUserResponse.customer)
+        : null;
+      this.alertProcess("User updated", "info");
+      return;
+    },
+    async verifyEmailCustomer() {
+      const searchCustomer = await getUserByEmail(this.customerData.email);
+      if (searchCustomer.length > 0) {
+        this.loading = false;
+        this.alertProcess(
+          `There is already a customer with the email ${this.customerData.email}. Please try another email.`,
+          "warning"
+        );
+        return true;
+      }
+      return false;
+    },
     alertProcess(text, method) {
       this.alert = {
         value: true,
@@ -203,91 +274,6 @@ export default {
         method,
       };
     },
-    async signUp() {
-      this.loading = true;
-      const searchCustomer = await getUserByEmail(this.data.email);
-      if (searchCustomer.length > 0) {
-        this.loading = false;
-        this.alertProcess(
-          `There is already a customer with the email ${this.data.email}. Please try another email.`,
-          "warning"
-        );
-
-        return;
-      }
-      console.log(searchCustomer);
-      const responseCredentialsAuthCreated = await this.createUserAuth(
-        this.data.email
-      );
-      if (responseCredentialsAuthCreated) {
-        const { email, firstname, lastname } = this.$store.getters.getUser;
-        const createUserResponse = await createUser({
-          ...this.data,
-          createdBy: { email, name: `${firstname} ${lastname}` },
-        });
-        createUserResponse.hasOwnProperty("id")
-          ? (this.alert.value = true)
-          : this.alertProcess(createUserResponse, "error");
-
-        this.data = {
-          accoundID: null,
-          firstname: "",
-          lastname: "",
-          role: "",
-          email: "",
-          phoneNumber: "",
-          avatar: [],
-        };
-      }
-      this.loading = false;
-    },
-
-    async createUserAuth(email) {
-      const newPassword = await this.generateRandomPassword(12);
-      const createUserAuths = await registerUserAndSendVerificationEmail(
-        email,
-        newPassword
-      );
-      console.log(newPassword, createUserAuths.uid);
-      this.data.authID = createUserAuths.uid;
-      if (createUserAuths.hasOwnProperty("email")) {
-        this.alertProcess(
-          "User created successfully, login password will be sent by email.",
-          "info"
-        );
-        return true;
-      }
-      this.alertProcess(
-        createUserAuths.includes("invalid-email")
-          ? "The email entered is not valid for creating a new user, please try another one."
-          : createUserAuths.includes("email-already-in-use")
-          ? "The email entered for creating credentials is already in use by another user. Please verify your email and try again."
-          : createUserAuths,
-        "error"
-      );
-
-      return false;
-    },
-    generateRandomPassword(length) {
-      const charset =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+<>?";
-      let password = "";
-
-      for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * charset.length);
-        password += charset[randomIndex];
-      }
-
-      return password;
-    },
-    // async notifyAdmins() {
-    //   console.log(await getAdmins());
-
-    //   this.alert = {
-    //     value: true,
-    //     text: "User created successfully, login password will be sent to email.",
-    //   };
-    // },
   },
 };
 </script>
@@ -311,5 +297,13 @@ div {
   position: sticky;
   top: 0px;
   z-index: 200;
+}
+.circular-image {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  background-size: cover;
+  background-position: center;
+  margin-bottom: 10px;
 }
 </style>

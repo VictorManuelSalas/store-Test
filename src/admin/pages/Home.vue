@@ -35,11 +35,10 @@ export default {
     },
   },
   mounted() {
-    console.log("userValue", this.user);
-    if (!this.user) {
-      this.$router.push("/");
-    }
     setTimeout(() => {
+      if (!this.user) {
+        this.$router.push("/");
+      }
       this.loader = false;
     }, 2000);
   },
@@ -52,8 +51,8 @@ main {
   display: flex;
   height: 100vh;
 
-  section { 
-    width: clamp(60%, 100%, 100%); 
+  section {
+    width: clamp(60%, 100%, 100%);
     height: 100vh;
     padding-bottom: 1rem;
     overflow: auto;

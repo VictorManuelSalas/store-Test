@@ -6,4 +6,5 @@ module.exports = firebaseConfig = {
   messagingSenderId: process.env.VUE_APP_messagingSenderId,
   appId: process.env.VUE_APP_appId,
   measurementId: process.env.VUE_APP_measurementId,
+  
 };

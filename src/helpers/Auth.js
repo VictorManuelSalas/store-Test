@@ -24,7 +24,6 @@ const logIn = async (email, password) => {
 };
 
 const logOut = async ( ) => {
-  console.log("cerrando sesion..." ); 
   return await signOut( auth)
     .then(() => {
       return 200;
@@ -78,10 +77,8 @@ const registerUserAndSendVerificationEmail = async (email, password) => {
 };
 
 const handleVerifyEmail = async (actionCode) => {
-  console.log("test", auth.currentUser);
   return await applyActionCode(auth, actionCode)
     .then((resp) => {
-      console.log("entre y si se verifico", resp);
       return resp;
     })
     .catch((error) => {

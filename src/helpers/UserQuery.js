@@ -4,6 +4,8 @@ import {
   getDocs,
   where,
   query,
+  doc,
+  getDoc,
 } from "firebase/firestore";
 
 const db = getFirestore();
@@ -21,6 +23,22 @@ const getUserByEmail = async (email) => {
   } catch (e) {
     console.error("Error getting document: ", e);
     return e;
+  }
+};
+
+const getUserByID = async (id) => {
+  try {
+    const docRef = doc(db, "users", id);
+    const docSnapshot = await getDoc(docRef);
+
+    if (docSnapshot.exists()) {
+      return docSnapshot.data();
+    } else {
+      return null;  
+    }
+  } catch (e) {
+    console.error("Error getting document:", e);
+    return e;  
   }
 };
 
@@ -58,4 +76,4 @@ const getAllCustomers = async () => {
   }
 };
 
-export { getUserByEmail, getAdmins, getAllCustomers };
+export { getUserByEmail, getAdmins, getAllCustomers, getUserByID };

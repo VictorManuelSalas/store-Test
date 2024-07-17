@@ -14,7 +14,9 @@ export default {
   data: () => ({
     //
   }),
-  mounted() {},
+  mounted() {
+    app
+  },
 };
 </script>
 

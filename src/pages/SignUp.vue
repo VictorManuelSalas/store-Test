@@ -199,7 +199,6 @@ export default {
         email,
         newPassword
       );
-      console.log(newPassword, createUserAuths);
       if (createUserAuths.hasOwnProperty("email")) {
         this.alert = {
           value: false,
