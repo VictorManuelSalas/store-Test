@@ -33,6 +33,7 @@ const getDefaultState = () => {
       },
     ],
     invoices: [],
+    customersOdoo: [],
   };
 };
 
@@ -40,6 +41,14 @@ export default new Vuex.Store({
   state: getDefaultState(),
   mutations: {
     setUser(state, user) {
+      if (state.user !== null) {
+        Object.keys(user).forEach((key) => { 
+          if (state.user.hasOwnProperty(key)) {
+            state.user[key] = user[key];
+          }
+        });
+        return;
+      }
       state.user = user;
     },
     setItems(state, items) {
@@ -51,10 +60,16 @@ export default new Vuex.Store({
     setInvoices(state, invoices) {
       state.invoices = invoices;
     },
+    setCustomersOdoo(state, customers) {
+      state.customersOdoo = customers;
+    },
   },
   actions: {
     fetchUser({ commit }, userData) {
       commit("setUser", userData);
+    },
+    fetchCustomersOdoo({ commit }, odooCustomers) {
+      commit("setCustomersOdoo", odooCustomers);
     },
     fetchInvoices({ commit }, userInvoices) {
       commit("setInvoices", userInvoices);
@@ -82,6 +97,7 @@ export default new Vuex.Store({
     getUser: (state) => state.user,
     getItems: (state) => state.items,
     getInvoices: (state) => state.invoices,
+    getCustomersOdoo: (state) => state.customersOdoo,
   },
   modules: {},
 });

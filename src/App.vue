@@ -15,12 +15,9 @@ export default {
     //
   }),
   mounted() {
-    app
   },
 };
 </script>
 
 <style scoped>
-#app{ 
-}
 </style>

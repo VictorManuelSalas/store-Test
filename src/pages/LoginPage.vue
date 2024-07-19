@@ -125,13 +125,14 @@ export default {
         }, 5000);
         return;
       }
-
       const user = await this.getUserInfo(loginResponse?.email);
       if (user) {
         this.$store.dispatch("fetchUser", {
           auth: {
+            api_key: loginResponse.auth.config.apiKey,
             token: loginResponse.stsTokenManager.accessToken,
             refreshToken: loginResponse.stsTokenManager.refreshToken,
+            account_verified: loginResponse.emailVerified,
           },
           ...user,
         });

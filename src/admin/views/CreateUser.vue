@@ -50,16 +50,6 @@
           <v-row class="pl-6">
             <v-col cols="12" md="6" ms="4">
               <v-text-field
-                v-model="data.accoundID"
-                :rules="accountIDRule"
-                label="Account ID"
-                required
-                filled
-              ></v-text-field>
-            </v-col>
-
-            <v-col cols="12" md="6" ms="4">
-              <v-text-field
                 v-model="data.firstname"
                 :rules="nameRules"
                 label="First name"
@@ -117,6 +107,63 @@
                 label="Avatar"
               ></v-file-input>
             </v-col>
+            <v-col cols="12" md="6" ms="4">
+              <v-autocomplete
+                v-model="data.accountID"
+                :rules="accountIDRule"
+                :items="odooCustomers"
+                filled
+                chips
+                color="blue-grey lighten-2"
+                label="Account ID"
+                item-text="id"
+                item-value="id"
+                multiple
+                required
+              >
+                <template v-slot:selection="data">
+                  <v-chip
+                    v-bind="data.attrs"
+                    :input-value="data.selected"
+                    close
+                    @click="data.select"
+                    @click:close="removeAccountId(data.item)"
+                  >
+                    <v-avatar left>
+                      <img
+                        :src="'data:image/png;base64,' + data.item.avatar_128"
+                        :alt="data.item.name"
+                      />
+                    </v-avatar>
+                    {{ data.item.name }}
+                  </v-chip>
+                </template>
+                <template v-slot:item="data">
+                  <template v-if="typeof data.item !== 'object'">
+                    <v-list-item-content
+                      v-text="data.item"
+                    ></v-list-item-content>
+                  </template>
+                  <template v-else>
+                    <v-list-item-avatar>
+                      <img
+                        :src="'data:image/png;base64,' + data.item.avatar_128"
+                      />
+                    </v-list-item-avatar>
+                    <v-list-item-content>
+                      <v-list-item-title
+                        v-html="data.item.name"
+                      ></v-list-item-title>
+                      <v-list-item-subtitle
+                        v-html="data.item.email || 'null'"
+                      ></v-list-item-subtitle>
+                    </v-list-item-content>
+                  </template>
+                </template>
+              </v-autocomplete>
+            </v-col>
+
+            <v-col cols="12" md="6" ms="0"></v-col>
           </v-row>
         </v-form>
       </v-card-text>
@@ -146,8 +193,8 @@
 </template>
 
 <script>
-import { createUser } from "../../helpers/User";
-import { registerUserAndSendVerificationEmail } from "../../helpers/Auth";
+import { uploadImage } from "../../helpers/User";
+import { registerUserAndSendCredentials } from "../../helpers/Auth";
 import { getUserByEmail } from "../../helpers/UserQuery";
 
 export default {
@@ -162,10 +209,9 @@ export default {
     valid: false,
     rolesValues: ["admin", "client"],
     data: {
-      accoundID: null,
+      accountID: null,
       firstname: "",
       lastname: "",
-      role: "",
       email: "",
       phoneNumber: "",
       avatar: [],
@@ -175,27 +221,27 @@ export default {
       (v) => !!v || "Name is required",
       (v) => v.length >= 5 || "Name must be more than 5 characters",
     ],
-
     emailRules: [
       (v) => !!v || "E-mail is required",
       (v) => /.+@.+/.test(v) || "E-mail must be valid",
     ],
-
     phoneRule: [
       (v) => !!v || "Phone number is required",
       (v) => /^\d{10}$/.test(v) || "Phone must be valid",
     ],
-    accountIDRule: [
-      (v) => !!v || "Account ID is required",
-      (v) => /^\d+$/.test(v) || "Account ID must contain only numbers",
-    ],
+    accountIDRule: [(v) => !!v || "Account ID is required"],
   }),
-
-  mounted() {
-    const { email, firstname, lastname } = this.$store.getters.getUser;
-    console.log(email, firstname, lastname);
+  computed: {
+    odooCustomers() {
+      return this.$store.getters.getCustomersOdoo;
+    },
   },
+  mounted() {},
   methods: {
+    removeAccountId(item) {
+      const index = this.data.accountID.indexOf(item.id);
+      if (index >= 0) this.data.accountID.splice(index, 1);
+    },
     alertProcess(text, method) {
       this.alert = {
         value: true,
@@ -212,25 +258,32 @@ export default {
           `There is already a customer with the email ${this.data.email}. Please try another email.`,
           "warning"
         );
-
         return;
       }
-      console.log(searchCustomer);
+
+      //img verify and upload
+      if ("name" in this.data.avatar) {
+        this.data.avatar = await uploadImage(this.data.avatar)
+          .then((downloadURL) => {
+            return downloadURL;
+          })
+          .catch((error) => {
+            console.error("Upload failed:", error);
+          });
+      }
+
+      console.log("nuevo", this.data);
+
       const responseCredentialsAuthCreated = await this.createUserAuth(
-        this.data.email
+        this.data
+      );
+      console.log(
+        "responseCredentialsAuthCreated=> ,",
+        responseCredentialsAuthCreated
       );
       if (responseCredentialsAuthCreated) {
-        const { email, firstname, lastname } = this.$store.getters.getUser;
-        const createUserResponse = await createUser({
-          ...this.data,
-          createdBy: { email, name: `${firstname} ${lastname}` },
-        });
-        createUserResponse.hasOwnProperty("id")
-          ? (this.alert.value = true)
-          : this.alertProcess(createUserResponse, "error");
-
         this.data = {
-          accoundID: null,
+          accountID: null,
           firstname: "",
           lastname: "",
           role: "",
@@ -242,52 +295,35 @@ export default {
       this.loading = false;
     },
 
-    async createUserAuth(email) {
-      const newPassword = await this.generateRandomPassword(12);
-      const createUserAuths = await registerUserAndSendVerificationEmail(
-        email,
-        newPassword
+    async createUserAuth(data) {
+      const { auth, email, firstname, lastname } = this.$store.getters.getUser;
+      const createUserAuthsAndPerfile = await registerUserAndSendCredentials(
+        {
+          ...data,
+          createdBy: { email, name: `${firstname} ${lastname}` },
+        },
+        auth.token
       );
-      console.log(newPassword, createUserAuths.uid);
-      this.data.authID = createUserAuths.uid;
-      if (createUserAuths.hasOwnProperty("email")) {
+      console.log(createUserAuthsAndPerfile);
+      if (createUserAuthsAndPerfile === "Customer created") {
         this.alertProcess(
           "User created successfully, login password will be sent by email.",
           "info"
         );
         return true;
       }
+
       this.alertProcess(
-        createUserAuths.includes("invalid-email")
+        createUserAuthsAndPerfile.includes("invalid-email")
           ? "The email entered is not valid for creating a new user, please try another one."
-          : createUserAuths.includes("email-already-in-use")
+          : createUserAuthsAndPerfile.includes("email-already-in-use")
           ? "The email entered for creating credentials is already in use by another user. Please verify your email and try again."
-          : createUserAuths,
+          : createUserAuthsAndPerfile,
         "error"
       );
 
       return false;
     },
-    generateRandomPassword(length) {
-      const charset =
-        "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+<>?";
-      let password = "";
-
-      for (let i = 0; i < length; i++) {
-        const randomIndex = Math.floor(Math.random() * charset.length);
-        password += charset[randomIndex];
-      }
-
-      return password;
-    },
-    // async notifyAdmins() {
-    //   console.log(await getAdmins());
-
-    //   this.alert = {
-    //     value: true,
-    //     text: "User created successfully, login password will be sent to email.",
-    //   };
-    // },
   },
 };
 </script>

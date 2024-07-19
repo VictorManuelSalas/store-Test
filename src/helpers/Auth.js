@@ -4,13 +4,48 @@ import {
   signOut,
   verifyPasswordResetCode,
   confirmPasswordReset,
-  createUserWithEmailAndPassword,
-  sendEmailVerification,
   applyActionCode,
   deleteUser,
 } from "firebase/auth";
 
 const auth = getAuth();
+
+const axios = require("axios");
+
+const registerUserAndSendCredentials = async (data, token) => {
+  try {
+    console.log(data, token);
+    const resp = await axios
+      .post(
+        `http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/customers/new`,
+        { user: data },
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log("respuesta", response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        console.log("respuesta", error.response.status);
+        if (error.response.status === 403) {
+          throw new Error(error.response.data);
+        }
+        throw new Error(error.response.data.body.msg);
+      });
+
+    if (resp.error) {
+      return resp.body.msg;
+    }
+    return resp.body.customer;
+  } catch (error) {
+    console.log("Error: ", error);
+    return error;
+  }
+};
 
 const logIn = async (email, password) => {
   return await signInWithEmailAndPassword(auth, email, password)
@@ -23,8 +58,8 @@ const logIn = async (email, password) => {
     });
 };
 
-const logOut = async ( ) => {
-  return await signOut( auth)
+const logOut = async () => {
+  return await signOut(auth)
     .then(() => {
       return 200;
     })
@@ -54,25 +89,42 @@ const handleResetPassword = async (actionCode, newPassword) => {
     });
 };
 
-const registerUserAndSendVerificationEmail = async (email, password) => {
+const verifyEmail = async (customer) => {
   try {
-    const userCredential = await createUserWithEmailAndPassword(
-      auth,
-      email,
-      password
-    );
-    const user = userCredential.user;
+    const { firstname, lastname, auth, email } = customer;
+    const data = {
+      name: `${firstname} ${lastname}`,
+      email: email,
+    };
+    const resp = await axios
+      .post(
+        `http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/customers/sendVerificationEmail`,
+        { customer: data },
+        {
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log("respuesta", response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        console.log("respuesta", error.response.status);
+        if (error.response.status === 403) {
+          throw new Error(error.response.data);
+        }
+        throw new Error(error.response.data.body.msg);
+      });
 
-    await sendEmailVerification(user);
-    console.log("Correo de verificación enviado a:", email);
-    console.log(user);
-    return user;
+    if (resp.error) {
+      return resp.body.msg;
+    }
+    return resp;
   } catch (error) {
-    console.error(
-      "Error al registrar el usuario y enviar el correo de verificación:",
-      error.message
-    );
-    return error.message;
+    console.log("Error: ", error);
+    return error;
   }
 };
 
@@ -106,11 +158,47 @@ const getUserAuthByEmail = async (email) => {
     throw error;
   }
 };
+
+const refreshToken = async (auth) => {
+  try {
+    const apiKey = auth.api_key;
+    const refreshToken = auth.refreshToken;
+
+    const tokenResponse = await axios
+      .post(
+        `https://securetoken.googleapis.com/v1/token?key=${apiKey}`,
+        new URLSearchParams({
+          grant_type: "refresh_token",
+          refresh_token: refreshToken,
+        }),
+        {
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+        }
+      )
+      .then((response) => {
+        console.log("Response data:", response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        throw new Error(error);
+      });
+
+    return tokenResponse;
+  } catch (error) {
+    return error;
+  }
+};
+
 export {
   logIn,
   logOut,
   handleResetPassword,
-  registerUserAndSendVerificationEmail,
+  registerUserAndSendCredentials,
   handleVerifyEmail,
   getUserAuthByEmail,
+  verifyEmail,
+  refreshToken,
 };

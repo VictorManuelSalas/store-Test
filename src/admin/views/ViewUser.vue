@@ -36,7 +36,7 @@
       <v-card-text class="mx-4 pt-8">
         <v-row
           ><v-col cols="12" sm="4" xl="6"
-            >Account ID (Odoo): {{ customerInfo?.accoundID || "-" }}</v-col
+            >Account ID (Odoo): {{ customerInfo?.accountID.join(", ") || "-" }}</v-col
           >
           <v-col cols="12" sm="4" xl="6"
             >Email: {{ customerInfo?.email || "-" }}</v-col

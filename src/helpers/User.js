@@ -15,12 +15,13 @@ import {
   getDownloadURL,
   deleteObject,
 } from "firebase/storage";
+const axios = require("axios");
 
 const db = getFirestore();
 
 //Create User
 const createUser = async (data) => {
-  try { 
+  try {
     if ("name" in data.avatar) {
       data.avatar = await uploadImage(data.avatar)
         .then((downloadURL) => {
@@ -84,15 +85,39 @@ const updateUser = async (id, data, imgChanged, proccess) => {
 };
 
 //delete User
-const deleteUser = async (id, imgDelete) => {
+const deleteUser = async (id, imgDelete, token) => {
   try {
     console.log("imgDelete", imgDelete);
     imgDelete ? await deleteImage(imgDelete) : null;
-    await deleteDoc(doc(db, "users", id));
-    return 200;
-  } catch (e) {
-    console.error("Error update document: ", e);
-    return e.message;
+
+    const resp = await axios
+      .delete(
+        `http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/customers/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log("respuesta", response);
+        return response.data;
+      })
+      .catch((error) => {
+        console.log("respuesta", error.response.status);
+        if (error.response.status === 403) {
+          throw new Error(error.response.data);
+        }
+        throw new Error(error.response.data.body.msg);
+      });
+
+    if (resp.error) {
+      return resp.body.msg;
+    }
+    return resp.body;
+  } catch (error) {
+    console.log("Error: ", error);
+    return error.message;
   }
 };
 
@@ -156,4 +181,4 @@ const deleteImage = async (img) => {
   }
 };
 
-export { createUser, updateUser, deleteUser, deleteImage };
+export { createUser, updateUser, deleteUser, deleteImage, uploadImage };

@@ -56,7 +56,6 @@
                   backgroundImage: `url(${customerData.avatar})`,
                 }"
               ></div>
-              
             </v-col>
             <v-col cols="12" md="6" ms="4">
               <v-file-input
@@ -71,15 +70,6 @@
                     : 'Avatar'
                 "
               ></v-file-input>
-            </v-col>
-            <v-col cols="12" md="6" ms="4">
-              <v-text-field
-                v-model="customerData.accoundID"
-                :rules="accountIDRule"
-                label="Account ID"
-                required
-                filled
-              ></v-text-field>
             </v-col>
 
             <v-col cols="12" md="6" ms="4">
@@ -131,6 +121,68 @@
                 v-model="customerData.role"
               ></v-select>
             </v-col>
+            <v-col cols="12" md="6" ms="4">
+              <v-autocomplete
+                v-model="customerData.accountID"
+                :rules="accountIDRule"
+                :items="odooCustomers"
+                filled
+                chips
+                color="blue-grey lighten-2"
+                label="Account ID"
+                item-text="id"
+                item-value="id"
+                multiple
+                required
+              >
+                <template v-slot:selection="customerData">
+                  <v-chip
+                    v-bind="customerData.attrs"
+                    :input-value="customerData.selected"
+                    close
+                    @click="customerData.select"
+                    @click:close="removeAccountId(customerData.item)"
+                  >
+                    <v-avatar left>
+                      <img
+                        :src="
+                          'data:image/png;base64,' +
+                          customerData.item.avatar_128
+                        "
+                        :alt="customerData.item.name"
+                      />
+                    </v-avatar>
+                    {{ customerData.item.name }}
+                  </v-chip>
+                </template>
+                <template v-slot:item="customerData">
+                  <template v-if="typeof customerData.item !== 'object'">
+                    <v-list-item-content
+                      v-text="customerData.item"
+                    ></v-list-item-content>
+                  </template>
+                  <template v-else>
+                    <v-list-item-avatar>
+                      <img
+                        :src="
+                          'data:image/png;base64,' +
+                          customerData.item.avatar_128
+                        "
+                      />
+                    </v-list-item-avatar>
+                    <v-list-item-content>
+                      <v-list-item-title
+                        v-html="customerData.item.name"
+                      ></v-list-item-title>
+                      <v-list-item-subtitle
+                        v-html="customerData.item.email || 'null'"
+                      ></v-list-item-subtitle>
+                    </v-list-item-content>
+                  </template>
+                </template>
+              </v-autocomplete>
+            </v-col>
+            <v-col cols="12" md="6" ms="0"> </v-col>
           </v-row>
         </v-form>
       </v-card-text>
@@ -199,20 +251,25 @@ export default {
       (v) => !!v || "Phone number is required",
       (v) => /^\d{10}$/.test(v) || "Phone must be valid",
     ],
-    accountIDRule: [
-      (v) => !!v || "Account ID is required",
-      (v) => /^\d+$/.test(v) || "Account ID must contain only numbers",
-    ],
+    accountIDRule: [(v) => !!v || "Account ID is required"],
     emailCustomer: null,
     imgCustomer: null,
   }),
-  computed: {},
+  computed: {
+    odooCustomers() {
+      return this.$store.getters.getCustomersOdoo;
+    },
+  },
 
   mounted() {
     this.emailCustomer = this.customerData.email;
     this.imgCustomer = this.customerData.avatar;
   },
   methods: {
+    removeAccountId(item) {
+      const index = this.customerData.accountID.indexOf(item.id);
+      if (index >= 0) this.customerData.accountID.splice(index, 1);
+    },
     async saveChanges() {
       this.loading = true;
       const verifyEmailResp =

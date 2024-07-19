@@ -90,9 +90,12 @@
         loading-text="Loading... Please wait"
       >
         <template v-slot:item.name="{ item }">
-          <router-link :to="`/home/user/${item.id}`">
-            {{ item.name }}</router-link
-          >
+          <router-link :to="`/${item.id}`"> {{ item.name }}</router-link>
+        </template>
+        <template v-slot:item.ref="{ item }">
+          <p :style="item.ref ? 'color: black;' : 'opacity: 0.5;'">
+            {{ item.ref ? item.ref : "null" }}
+          </p>
         </template>
         <template v-slot:item.invoice_date="{ item }">
           {{ item.invoice_date ? item.invoice_date : null }}
@@ -174,7 +177,7 @@
 </template>
 
 <script>
-import { getInvoicesUser, downloadInvoice } from "../helpers/Invoices";
+import { getInvoicesUser, downloadInvoice } from "../helpers/Odoo/Invoices";
 export default {
   data() {
     return {
@@ -215,7 +218,6 @@ export default {
         },
         { text: "Total", value: "amount_total", sortable: true },
         { text: "Status", value: "state", sortable: true, align: "center" },
-        { text: "Token", value: "access_token", sortable: true},
         { text: "Actions", value: "actions", sortable: false, align: "center" },
       ];
     },
@@ -258,12 +260,16 @@ export default {
     },
     async getInvoices() {
       const { accoundID, auth } = this.$store.getters.getUser;
+
       const invoices = await getInvoicesUser(accoundID, auth.token);
-      if (invoices.length) {
+      console.log(invoices);
+      if (invoices.length > 0) {
         this.invoices = invoices;
         this.$store.dispatch("fetchInvoices", invoices);
         this.invoicesProccessSearch = false;
         return;
+      } else if (invoices.length === 0) {
+        this.invoicesProccessSearch = false;
       } else {
         this.alertProcess(`${invoices.message}`, "error", 5000);
         this.invoicesProccessSearch = false;
@@ -427,8 +433,8 @@ div {
   cursor: pointer;
 }
 
-#alert{ 
-  width: 95vw; 
+#alert {
+  width: 95vw;
   position: fixed;
   z-index: 1;
 }

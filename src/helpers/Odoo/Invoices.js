@@ -1,10 +1,14 @@
 const axios = require("axios");
 
-const getInvoicesUser = async (userId, token) => {
+const getInvoicesUser = async (usersId, token) => {
   try {
+    console.log(
+      `http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/odoo/getInvoices/${usersId}`,
+      `Bearer ${token}`
+    );
     const resp = await axios
       .get(
-        `https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/odoo/getInvoices/${userId}`,
+        `http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/odoo/getInvoices/${usersId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -37,7 +41,7 @@ const downloadInvoice = async (invoice, token) => {
   try {
     const { name } = invoice;
     const response = await axios.post(
-      "https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/odoo/downloadInvoice",
+      "http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/odoo/downloadInvoice",
       invoice,
       {
         headers: {
@@ -62,11 +66,10 @@ const downloadInvoice = async (invoice, token) => {
   }
 };
 
-
 const openInvoiceView = async (invoice, token) => {
-  try { 
+  try {
     const response = await axios.post(
-      "https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/odoo/openInvoice",
+      "http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/odoo/openInvoice",
       invoice,
       {
         headers: {
@@ -80,7 +83,7 @@ const openInvoiceView = async (invoice, token) => {
     // Crear un enlace temporal para descargar el archivo
     const blob = new Blob([response.data], { type: "application/pdf" });
     const link = document.createElement("a");
-    link.href = window.URL.createObjectURL(blob); 
+    link.href = window.URL.createObjectURL(blob);
     window.URL.revokeObjectURL(link.href); // limpiar el URL del objeto después de la descarga
     return 200;
   } catch (error) {

@@ -68,6 +68,7 @@
           color="warning"
           elevation="5"
           large
+          :disabled="adminOptionsEnabled"
           @click="$router.push('/home/create-user')"
           >New User</v-btn
         >
@@ -95,7 +96,15 @@
             {{ item.firstname }}</router-link
           >
         </template>
-
+        <template v-slot:item.accountID="{ item }">
+          <p
+            :style="
+              item.accountID.length > 0 ? 'color: black;' : 'opacity: 0.5;'
+            "
+          >
+            {{ item.accountID.length > 0 ? item.accountID.join(", ") : "null" }}
+          </p> 
+        </template>
         <template v-slot:item.role="{ item }">
           <v-chip :color="item.role === 'admin' ? 'green' : 'orange'" dark>
             {{ item.role }}
@@ -130,7 +139,12 @@
             </template>
             <span>Archive</span>
           </v-tooltip>
-          <v-tooltip top max-width="fit-content" color="amber">
+          <v-tooltip
+            top
+            max-width="fit-content"
+            color="amber"
+            v-if="!adminOptionsEnabled"
+          >
             <template v-slot:activator="{ on, attrs }">
               <router-link
                 :to="{ name: 'update-user', params: { customerData: item } }"
@@ -200,6 +214,7 @@
 
 <script>
 import { getAllCustomers } from "../../helpers/UserQuery";
+import { getAllCustomersOdoo } from "../../helpers/Odoo/Customers";
 import { deleteUser } from "../../helpers/User";
 import ArchivedCustomers from "../components/ArchivedCustomers.vue";
 import { updateUser } from "../../helpers/User";
@@ -224,6 +239,7 @@ export default {
       customers: [],
       customersArchived: [],
       customerProcessSearch: true,
+      adminOptionsEnabled: false,
     };
   },
   computed: {
@@ -238,7 +254,7 @@ export default {
         { text: "Last Name", value: "lastname", sortable: true },
         {
           text: "Account ID",
-          value: "accoundID",
+          value: "accountID",
           sortable: true,
         },
         { text: "Email", value: "email", sortable: true },
@@ -249,9 +265,14 @@ export default {
   },
   mounted() {
     this.getCustomers();
+    if (this.$store.getters.getCustomersOdoo.length === 0) {
+      this.adminOptionsEnabled = true;
+      this.getCustomersOdoo();
+    }
   },
   methods: {
     alertProcess(text, method) {
+      this.dialogAttribute.hidde = true;
       this.alert = {
         value: true,
         text,
@@ -260,7 +281,7 @@ export default {
 
       setTimeout(() => {
         this.alert.value = false;
-      }, 2000);
+      }, 4000);
     },
     async getCustomers() {
       console.log("obteniendo usuarios...");
@@ -279,22 +300,18 @@ export default {
 
     async deleteCustomer() {
       const emailLoginUser = this.$store.getters.getUser.email;
-
       const { item } = this.dialogAttribute;
       item.email === emailLoginUser
         ? console.log(" no se puede eliminar ")
         : null;
       const imgDelete = typeof item.avatar === "string" ? item.avatar : false;
-      console.log(this.dialogAttribute, imgDelete, emailLoginUser);
-      console.log("eliminando customer avatar", imgDelete, typeof item.avatar);
-      const response = await deleteUser(item.id, imgDelete);
-      if (response === 200) {
+      const { auth } = this.$store.getters.getUser;
+      const response = await deleteUser(item.id, imgDelete, auth.token);
+      if (response.resp) {
         this.dialogAttribute.hidde = true;
         this.getCustomers();
-
         return;
       }
-
       this.alertProcess(response, "error");
     },
 
@@ -319,6 +336,7 @@ export default {
 
       this.alertProcess(archivedStatus.error, "error");
     },
+
     async unarchiveCustomer(id) {
       console.log("desarchivar", id);
       const archivedStatus = await updateUser(
@@ -331,6 +349,18 @@ export default {
       if (archivedStatus.status === 200) {
         this.dialogAttribute.hidde = true;
         this.getCustomers();
+      }
+    },
+
+    async getCustomersOdoo() {
+      console.log("obteniendo customers de odoo...");
+      const { auth } = this.$store.getters.getUser;
+      const data = await getAllCustomersOdoo(auth.token);
+      console.log(data);
+      if (data.length > 0) {
+        this.$store.dispatch("fetchCustomersOdoo", data);
+        this.adminOptionsEnabled = !this.adminOptionsEnabled;
+        console.log(this.$store.getters.getCustomersOdoo);
       }
     },
   },
