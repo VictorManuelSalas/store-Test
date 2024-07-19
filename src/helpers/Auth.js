@@ -98,7 +98,7 @@ const verifyEmail = async (customer) => {
     };
     const resp = await axios
       .post(
-        `http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/customers/sendVerificationEmail`,
+        `https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/customers/sendVerificationEmail`,
         { customer: data },
         {
           headers: {
