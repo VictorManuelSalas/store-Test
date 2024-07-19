@@ -3,12 +3,12 @@ const axios = require("axios");
 const getInvoicesUser = async (usersId, token) => {
   try {
     console.log(
-      `http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/odoo/getInvoices/${usersId}`,
+      `https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/odoo/getInvoices/${usersId}`,
       `Bearer ${token}`
     );
     const resp = await axios
       .get(
-        `http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/odoo/getInvoices/${usersId}`,
+        `https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/odoo/getInvoices/${usersId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -41,7 +41,7 @@ const downloadInvoice = async (invoice, token) => {
   try {
     const { name } = invoice;
     const response = await axios.post(
-      "http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/odoo/downloadInvoice",
+      "https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/odoo/downloadInvoice",
       invoice,
       {
         headers: {
@@ -69,7 +69,7 @@ const downloadInvoice = async (invoice, token) => {
 const openInvoiceView = async (invoice, token) => {
   try {
     const response = await axios.post(
-      "http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/odoo/openInvoice",
+      "https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/odoo/openInvoice",
       invoice,
       {
         headers: {
