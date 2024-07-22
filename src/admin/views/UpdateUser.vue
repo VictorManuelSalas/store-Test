@@ -37,7 +37,7 @@
         </v-col>
       </v-row>
     </v-alert>
-    <v-card id="card" :loading="loading" class="ma-6">
+    <v-card id="card" :loading="loading" class="ma-6 pt-5">
       <template slot="progress">
         <v-progress-linear height="5" indeterminate></v-progress-linear>
       </template>
@@ -363,4 +363,16 @@ div {
   background-position: center;
   margin-bottom: 10px;
 }
+
+@media (max-width: 650px) {
+  div {
+    display: flex;
+    flex-direction: column;
+    #card {
+      width: 90%;
+      height: fit-content;
+    }
+  }
+}
+
 </style>

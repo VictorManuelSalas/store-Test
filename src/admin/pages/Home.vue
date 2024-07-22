@@ -1,12 +1,15 @@
 <template>
   <Loader v-if="loader" />
   <main v-else>
+    
     <MenuNavar
       :user="{
         name: `${user.firstname} ${user.lastname}`,
         avatar: user.avatar,
       }"
     />
+
+   
     <section>
       <HeaderSection />
       <router-view />
@@ -26,13 +29,13 @@ export default {
   },
   data() {
     return {
-      loader: true,
+      loader: true, 
     };
   },
   computed: {
     user() {
       return this.$store.getters.getUser;
-    },
+    }, 
   },
   mounted() {
     setTimeout(() => {

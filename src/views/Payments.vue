@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { getAllCustomers } from "../helpers/Odoo/Customers";
+import { getAllCustomersOdoo } from "../helpers/Odoo/Customers";
 export default {
   data() {
     return { customers: [] };
@@ -27,7 +27,7 @@ export default {
   methods: {
     async tets() {
       const { auth } = this.$store.getters.getUser;
-      this.customers = await getAllCustomers(auth.token);
+      this.customers = await getAllCustomersOdoo(auth.token);
     },
   },
 };

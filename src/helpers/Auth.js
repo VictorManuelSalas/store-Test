@@ -32,7 +32,7 @@ const registerUserAndSendCredentials = async (data, token) => {
       .catch((error) => {
         console.log("respuesta", error.response.status);
         if (error.response.status === 403) {
-          throw new Error(error.response.data);
+          throw new Error(403);
         }
         throw new Error(error.response.data.body.msg);
       });
@@ -40,7 +40,7 @@ const registerUserAndSendCredentials = async (data, token) => {
     if (resp.error) {
       return resp.body.msg;
     }
-    return resp.body.customer;
+    return resp.body;
   } catch (error) {
     console.log("Error: ", error);
     return error;
@@ -139,26 +139,6 @@ const handleVerifyEmail = async (actionCode) => {
     });
 };
 
-const getUserAuthByEmail = async (email) => {
-  try {
-    deleteUser("w9YMqgSjxGVAXNqE3dTOYDENLiy1")
-      .then(() => {
-        console.error("elimindai");
-        // User deleted.
-      })
-      .catch((error) => {
-        console.error("Error fetching user data:", error);
-        // An error ocurred
-        // ...
-      });
-
-    return "user";
-  } catch (error) {
-    console.error("Error fetching user data:", error);
-    throw error;
-  }
-};
-
 const refreshToken = async (auth) => {
   try {
     const apiKey = auth.api_key;
@@ -198,7 +178,6 @@ export {
   handleResetPassword,
   registerUserAndSendCredentials,
   handleVerifyEmail,
-  getUserAuthByEmail,
   verifyEmail,
   refreshToken,
 };

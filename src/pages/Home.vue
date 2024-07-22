@@ -1,6 +1,7 @@
 <template>
   <Loader v-if="loader" />
   <main v-else>
+    
     <HeaderSection />
     <section>
       <v-alert
@@ -50,12 +51,14 @@ export default {
       loader: true,
       loading: false,
       verify: true,
+    
     };
   },
   computed: {
     user() {
       return this.$store.getters.getUser;
     },
+    
   },
   mounted() {
     setTimeout(() => {
@@ -87,7 +90,7 @@ main {
   display: flex;
   flex-direction: column;
   height: 100vh;
-
+  background-color: rgba(237, 245, 244, 255);
   section {
     width: clamp(60%, 100%, 100%);
     height: 100vh;

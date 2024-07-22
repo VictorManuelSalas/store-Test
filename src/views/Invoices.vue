@@ -177,6 +177,7 @@
 </template>
 
 <script>
+import { refreshToken } from "../helpers/Auth";
 import { getInvoicesUser, downloadInvoice } from "../helpers/Odoo/Invoices";
 export default {
   data() {
@@ -259,10 +260,12 @@ export default {
       this.invoicesAlert = false;
     },
     async getInvoices() {
-      const { accoundID, auth } = this.$store.getters.getUser;
-
-      const invoices = await getInvoicesUser(accoundID, auth.token);
-      console.log(invoices);
+      const { accountID, auth } = this.$store.getters.getUser;
+      const invoices = await getInvoicesUser(accountID, auth.token);
+      if ("message" in invoices && invoices.message == 403) {
+        this.refreshAndSaveToken(auth);
+        return;
+      }
       if (invoices.length > 0) {
         this.invoices = invoices;
         this.$store.dispatch("fetchInvoices", invoices);
@@ -275,7 +278,15 @@ export default {
         this.invoicesProccessSearch = false;
       }
     },
-
+    async refreshAndSaveToken(auth) {
+      const newTokens = await refreshToken(auth);
+      if ("access_token" in newTokens) {
+        this.$store.dispatch("fetchUserTokens", newTokens.access_token);
+        setTimeout(() => { 
+          this.getInvoices();
+        }, 2000);
+      }
+    },
     filterDateRange() {
       this.invoices = [];
       this.invoicesProccessSearch = true;
@@ -311,6 +322,9 @@ export default {
         this.alert.value = false;
       }, duration);
     },
+  },
+  beforeDestroy() {
+    this.refreshAndSaveToken();
   },
 };
 </script>

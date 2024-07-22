@@ -42,7 +42,7 @@ export default new Vuex.Store({
   mutations: {
     setUser(state, user) {
       if (state.user !== null) {
-        Object.keys(user).forEach((key) => { 
+        Object.keys(user).forEach((key) => {
           if (state.user.hasOwnProperty(key)) {
             state.user[key] = user[key];
           }
@@ -50,6 +50,10 @@ export default new Vuex.Store({
         return;
       }
       state.user = user;
+    },
+
+    setTokens(state, token) {
+      state.user.auth.token = token;
     },
     setItems(state, items) {
       state.items = items;
@@ -67,6 +71,9 @@ export default new Vuex.Store({
   actions: {
     fetchUser({ commit }, userData) {
       commit("setUser", userData);
+    },
+    fetchUserTokens({ commit }, token) {
+      commit("setTokens", token);
     },
     fetchCustomersOdoo({ commit }, odooCustomers) {
       commit("setCustomersOdoo", odooCustomers);

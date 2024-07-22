@@ -106,18 +106,18 @@ const deleteUser = async (id, imgDelete, token) => {
       .catch((error) => {
         console.log("respuesta", error.response.status);
         if (error.response.status === 403) {
-          throw new Error(error.response.data);
+          throw new Error(403);
         }
         throw new Error(error.response.data.body.msg);
       });
 
     if (resp.error) {
-      return resp.body.msg;
+      return resp.body;
     }
     return resp.body;
   } catch (error) {
     console.log("Error: ", error);
-    return error.message;
+    return error;
   }
 };
 

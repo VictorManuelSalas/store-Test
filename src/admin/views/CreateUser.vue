@@ -37,7 +37,7 @@
         </v-col>
       </v-row>
     </v-alert>
-    <v-card id="card" :loading="loading" class="ma-6">
+    <v-card id="card" :loading="loading" class="ma-6 pt-5">
       <template slot="progress">
         <v-progress-linear height="5" indeterminate></v-progress-linear>
       </template>
@@ -193,6 +193,7 @@
 </template>
 
 <script>
+import { refreshToken } from "../../helpers/Auth";
 import { uploadImage } from "../../helpers/User";
 import { registerUserAndSendCredentials } from "../../helpers/Auth";
 import { getUserByEmail } from "../../helpers/UserQuery";
@@ -260,7 +261,6 @@ export default {
         );
         return;
       }
-
       //img verify and upload
       if ("name" in this.data.avatar) {
         this.data.avatar = await uploadImage(this.data.avatar)
@@ -271,9 +271,6 @@ export default {
             console.error("Upload failed:", error);
           });
       }
-
-      console.log("nuevo", this.data);
-
       const responseCredentialsAuthCreated = await this.createUserAuth(
         this.data
       );
@@ -305,7 +302,19 @@ export default {
         auth.token
       );
       console.log(createUserAuthsAndPerfile);
-      if (createUserAuthsAndPerfile === "Customer created") {
+
+      if (
+        "message" in createUserAuthsAndPerfile &&
+        createUserAuthsAndPerfile.message == 403
+      ) {
+        this.refreshAndSaveToken(auth);
+        return;
+      }
+
+      if (
+        "customer" in createUserAuthsAndPerfile &&
+        createUserAuthsAndPerfile.customer === "Customer created"
+      ) {
         this.alertProcess(
           "User created successfully, login password will be sent by email.",
           "info"
@@ -324,13 +333,23 @@ export default {
 
       return false;
     },
+
+    async refreshAndSaveToken(auth) {
+      const newTokens = await refreshToken(auth);
+      if ("access_token" in newTokens) {
+        this.$store.dispatch("fetchUserTokens", newTokens.access_token);
+        setTimeout(() => {
+          this.createUserAuth(this.data);
+          return;
+        }, 2000);
+      }
+    },
   },
 };
 </script>
 
 <style lang="scss" scoped>
 div {
-  margin: auto;
   width: clamp(60%, 100%, 100%);
   #card {
     width: 95%;
@@ -347,5 +366,15 @@ div {
   position: sticky;
   top: 0px;
   z-index: 200;
+}
+@media (max-width: 650px) {
+  div {
+    display: flex;
+    flex-direction: column;
+    #card {
+      width: 90%;
+      height: fit-content;
+    }
+  }
 }
 </style>

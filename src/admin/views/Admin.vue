@@ -27,7 +27,7 @@
                 : archiveCustomer()
             "
           >
-            Accept
+            {{ deleteLoader ? "Loading..." : "Acept" }}
           </button>
         </span>
       </div>
@@ -68,10 +68,14 @@
           color="warning"
           elevation="5"
           large
+          :loading="loadingOdooCustomers"
           :disabled="adminOptionsEnabled"
           @click="$router.push('/home/create-user')"
-          >New User</v-btn
-        >
+          >New User
+          <template v-slot:loader>
+            <span>Loading...</span>
+          </template>
+        </v-btn>
         <section>
           <h1 class="ml-5">Customers</h1>
           <ArchivedCustomers
@@ -103,7 +107,7 @@
             "
           >
             {{ item.accountID.length > 0 ? item.accountID.join(", ") : "null" }}
-          </p> 
+          </p>
         </template>
         <template v-slot:item.role="{ item }">
           <v-chip :color="item.role === 'admin' ? 'green' : 'orange'" dark>
@@ -213,6 +217,7 @@
 </template>
 
 <script>
+import { refreshToken } from "../../helpers/Auth";
 import { getAllCustomers } from "../../helpers/UserQuery";
 import { getAllCustomersOdoo } from "../../helpers/Odoo/Customers";
 import { deleteUser } from "../../helpers/User";
@@ -235,10 +240,12 @@ export default {
         hidde: true,
         item: null,
       },
+      deleteLoader: false,
       search: "",
       customers: [],
       customersArchived: [],
       customerProcessSearch: true,
+      loadingOdooCustomers: false,
       adminOptionsEnabled: false,
     };
   },
@@ -266,6 +273,7 @@ export default {
   mounted() {
     this.getCustomers();
     if (this.$store.getters.getCustomersOdoo.length === 0) {
+      this.loadingOdooCustomers = true;
       this.adminOptionsEnabled = true;
       this.getCustomersOdoo();
     }
@@ -293,12 +301,12 @@ export default {
         this.customersArchived = customersResponse.filter(
           (item) => item.archived === true
         );
-        this.customerProcessSearch = false;
       }
       console.log(customersResponse);
     },
 
     async deleteCustomer() {
+      this.deleteLoader = true;
       const emailLoginUser = this.$store.getters.getUser.email;
       const { item } = this.dialogAttribute;
       item.email === emailLoginUser
@@ -307,7 +315,15 @@ export default {
       const imgDelete = typeof item.avatar === "string" ? item.avatar : false;
       const { auth } = this.$store.getters.getUser;
       const response = await deleteUser(item.id, imgDelete, auth.token);
+      console.log("eliminar => ", response);
+
+      if ("message" in response && response.message == 403) {
+        this.refreshAndSaveToken(auth, "delete");
+        return;
+      }
+
       if (response.resp) {
+       this.deleteLoader = false;
         this.dialogAttribute.hidde = true;
         this.getCustomers();
         return;
@@ -357,10 +373,27 @@ export default {
       const { auth } = this.$store.getters.getUser;
       const data = await getAllCustomersOdoo(auth.token);
       console.log(data);
+      if ("message" in data && data.message == 403) {
+        this.refreshAndSaveToken(auth, "odoo");
+        return;
+      }
       if (data.length > 0) {
         this.$store.dispatch("fetchCustomersOdoo", data);
         this.adminOptionsEnabled = !this.adminOptionsEnabled;
         console.log(this.$store.getters.getCustomersOdoo);
+      }
+      this.loadingOdooCustomers = false;
+    },
+
+    async refreshAndSaveToken(auth, functionName) {
+      const newTokens = await refreshToken(auth);
+      if ("access_token" in newTokens) {
+        this.$store.dispatch("fetchUserTokens", newTokens.access_token);
+        setTimeout(() => {
+          functionName === "delete"
+            ? this.deleteCustomer()
+            : this.getCustomersOdoo();
+        }, 2000);
       }
     },
   },

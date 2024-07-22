@@ -22,7 +22,7 @@ const getInvoicesUser = async (usersId, token) => {
       .catch((error) => {
         console.log("respuesta", error.response.status);
         if (error.response.status === 403) {
-          throw new Error(error.response.data);
+          throw new Error(403);
         }
         throw new Error(error.response.data.body.msg);
       });
@@ -31,8 +31,7 @@ const getInvoicesUser = async (usersId, token) => {
       return resp.body.msg;
     }
     return resp.body.invoices;
-  } catch (error) {
-    console.log("Error: ", error);
+  } catch (error) { 
     return error;
   }
 };

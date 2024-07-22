@@ -18,7 +18,7 @@ const getAllCustomersOdoo = async (token) => {
       .catch((error) => {
         console.log("respuesta", error.response.status);
         if (error.response.status === 403) {
-          throw new Error(error.response.data);
+          throw new Error(403);
         }
         throw new Error(error.response.data.body.msg);
       });
