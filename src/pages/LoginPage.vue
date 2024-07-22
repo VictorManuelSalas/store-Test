@@ -130,8 +130,7 @@ export default {
         this.$store.dispatch("fetchUser", {
           auth: {
             api_key: loginResponse.auth.config.apiKey,
-            token:
-              "eyJhbGciOiJSUzI1NiIsImtpZCI6ImMxNTQwYWM3MWJiOTJhYTA2OTNjODI3MTkwYWNhYmU1YjA1NWNiZWMiLCJ0eXAiOiJKV1QifQ.eyJpc3MiOiJodHRwczovL3NlY3VyZXRva2VuLmdvb2dsZS5jb20vc21hcnRzdG9yZS05MGMwNyIsImF1ZCI6InNtYXJ0c3RvcmUtOTBjMDciLCJhdXRoX3RpbWUiOjE3MjE0MjY3MTcsInVzZXJfaWQiOiI1eDN3eERjem83YU94a05sYkVqenI1YnFkd2cxIiwic3ViIjoiNXgzd3hEY3pvN2FPeGtObGJFanpyNWJxZHdnMSIsImlhdCI6MTcyMTQyNjcxNywiZXhwIjoxNzIxNDMwMzE3LCJlbWFpbCI6InZudW5lekBxdWlja2FwcHMubXgiLCJlbWFpbF92ZXJpZmllZCI6dHJ1ZSwiZmlyZWJhc2UiOnsiaWRlbnRpdGllcyI6eyJlbWFpbCI6WyJ2bnVuZXpAcXVpY2thcHBzLm14Il19LCJzaWduX2luX3Byb3ZpZGVyIjoicGFzc3dvcmQifX0.KiImHzZm1CkQ1XkI4e4fGF4OrHr3c6itQPWSWG2jEyzC4tGjsW8zY4h8nLn0V_qsz69YLBPZkh9cTxJ1gauAbgaNF-kSik3jTMk-abzw_n9BDOqbjwpkPlm5g9cz4gyD3L0F5EW_s7LPco_VnsgBupC9Rbw_PeVYGyO-SeF2COCHeJjZR1vteeToVhquXkDecChPHPRM8wS4nDSgmDk6QBRrnwFcbdOXZUO9vwfuyok0uNPfHPf9UKT0w3WEL8aaBNtiGxB9U83dKs3XvmfR9NKVUoxhMJr7DbPgRUl-fWFjgY6NR_VsFcSYmorI1JJEmGHV5UeOqSCYJsfcK0XGpQ", //loginResponse.stsTokenManager.accessToken,
+            token: loginResponse.stsTokenManager.accessToken,
             refreshToken: loginResponse.stsTokenManager.refreshToken,
             account_verified: loginResponse.emailVerified,
           },
