@@ -5,7 +5,7 @@
         <v-icon id="btn" icon @click.stop="mini = !mini"
           >mdi-chevron-left
         </v-icon>
-        <img src="../assets/smartStoreLogo.png" alt="Logo" />
+        <img src="../assets/smartStoreLogo.webp" alt="Logo" />
       </v-list-item>
       <div id="avatar-menu">
         <img

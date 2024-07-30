@@ -7,7 +7,7 @@
             id="img"
             max-height="150"
             max-width="250"
-            src="../assets/smartStoreLogo.png"
+            src="../assets/smartStoreLogo.webp"
           ></v-img>
         </v-col>
         <v-col cols="12" sm="8" md="8" lg="8" xl="8">

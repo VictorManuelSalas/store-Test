@@ -1,27 +1,27 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import firebaseConfig from "./firebaseIntaller";
-
-// const firebaseConfig = {
-
-//     apiKey: "AIzaSyDgfgzsGLcLG12Rry2v5873_xwckV1M1kM",
-
-//     authDomain: "smartstore-90c07.firebaseapp.com",
-
-//     projectId: "smartstore-90c07",
-
-//     storageBucket: "smartstore-90c07.appspot.com",
-
-//     messagingSenderId: "369227442823",
-
-//     appId: "1:369227442823:web:88222e6e07b7311f006622",
-
-//     measurementId: "G-L3Q221XSQ8"
-
-//   };
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
+const auth = getAuth(app);
+
+// Función que se ejecuta cuando el usuario inicia sesión
+const handleUserSignIn = (user) => {
+  console.log("Usuario ha iniciado sesión:", user);
+  // Aquí puedes hacer lo que necesites cuando el usuario inicie sesión
+};
+
+// Configura el observador de estado de autenticación
+onAuthStateChanged(auth, (user) => {
+  if (user) {
+    handleUserSignIn(user);
+  } else {
+    console.log("No hay usuario autenticado.", user);
+  }
+});
+
 export { app };

@@ -36,7 +36,8 @@
       <v-card-text class="mx-4 pt-8">
         <v-row
           ><v-col cols="12" sm="4" xl="6"
-            >Account ID (Odoo): {{ customerInfo?.accountID.join(", ") || "-" }}</v-col
+            >Account ID (Odoo):
+            {{ customerInfo?.accountID.join(", ") || "-" }}</v-col
           >
           <v-col cols="12" sm="4" xl="6"
             >Email: {{ customerInfo?.email || "-" }}</v-col
@@ -46,18 +47,34 @@
             >Role: {{ customerInfo?.role || "-" }}</v-col
           >
           <v-col cols="12" sm="4" xl="6"
-            >Modified By: {{ customerInfo?.modifiedBy?.name || "-" }}</v-col
-          ><v-col cols="12" sm="4" xl="6"
             >Modified Date:
             {{ convertTimestampToDate(customerInfo?.modifiedAt || "-") }}</v-col
           >
-          <v-col cols="12" sm="4" xl="6"
-            >Created By: {{ customerInfo.createdBy?.name || "-" }}</v-col
-          >
+
           <v-col cols="12" sm="4" xl="6"
             >Created Date:
             {{ convertTimestampToDate(customerInfo?.createAt || "-") }}</v-col
-          ><v-col cols="12" sm="4" xl="6"> </v-col>
+          >
+          <v-col cols="12" sm="4" xl="6"
+            ><span style="display: flex"
+              >Modified By:
+              <div style="width: 70%">
+                {{ customerInfo?.modifiedBy?.name || "-" }} <br />
+                {{ customerInfo?.modifiedBy?.email || "-" }}
+              </div></span
+            >
+          </v-col>
+
+          <v-col cols="12" sm="4" xl="6">
+            <span style="display: flex"
+              >Created By:
+              <div style="width: 70%">
+                {{ customerInfo.createdBy?.name || "-" }} <br />
+                {{ customerInfo.createdBy?.email || "-" }}
+              </div></span
+            >
+          </v-col>
+          <v-col cols="12" sm="4" xl="6"></v-col>
         </v-row>
       </v-card-text>
     </v-card>
@@ -68,7 +85,14 @@
 import { getUserByID } from "../../helpers/UserQuery.js";
 export default {
   data() {
-    return { customerInfo: null, loading: true };
+    return {
+      customerInfo: {
+        firstname: "",
+        avatar: [],
+        accountID: [],
+      },
+      loading: true,
+    };
   },
   computed: {
     customerId() {

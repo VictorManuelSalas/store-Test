@@ -89,9 +89,9 @@
         :loading="invoices.length == 0 && invoicesProccessSearch"
         loading-text="Loading... Please wait"
       >
-        <template v-slot:item.name="{ item }">
+        <!-- <template v-slot:item.name="{ item }">
           <router-link :to="`/${item.id}`"> {{ item.name }}</router-link>
-        </template>
+        </template> -->
         <template v-slot:item.ref="{ item }">
           <p :style="item.ref ? 'color: black;' : 'opacity: 0.5;'">
             {{ item.ref ? item.ref : "null" }}
@@ -103,18 +103,28 @@
         <template v-slot:item.amount_total="{ item }">
           $ {{ item.amount_total }}
         </template>
-        <template v-slot:item.state="{ item }">
+        <template v-slot:item.payment_state="{ item }">
           <v-chip
             :color="
-              item.state === 'posted'
-                ? 'green'
-                : item.state === 'draft'
-                ? 'gray'
-                : 'red'
+              item.payment_state === 'paid'
+                ? 'green darken-3'
+                : item.payment_state === 'in_payment'
+                ? 'blue lighten-1'
+                : item.payment_state === 'not_paid'
+                ? 'red accent-4'
+                : 'blue-grey lighten-3'
             "
             dark
           >
-            {{ item.state.toUpperCase() }}
+            {{
+              item.payment_state === "in_payment"
+                ? "In Payment"
+                : item.payment_state === "not_paid"
+                ? "Not Paid"
+                : item.payment_state === "paid"
+                ? "Paid"
+                : item.payment_state
+            }}
           </v-chip>
         </template>
 
@@ -218,7 +228,12 @@ export default {
           align: "center",
         },
         { text: "Total", value: "amount_total", sortable: true },
-        { text: "Status", value: "state", sortable: true, align: "center" },
+        {
+          text: "Status",
+          value: "payment_state",
+          sortable: true,
+          align: "center",
+        },
         { text: "Actions", value: "actions", sortable: false, align: "center" },
       ];
     },
@@ -282,7 +297,7 @@ export default {
       const newTokens = await refreshToken(auth);
       if ("access_token" in newTokens) {
         this.$store.dispatch("fetchUserTokens", newTokens.access_token);
-        setTimeout(() => { 
+        setTimeout(() => {
           this.getInvoices();
         }, 2000);
       }
@@ -291,11 +306,13 @@ export default {
       this.invoices = [];
       this.invoicesProccessSearch = true;
       const invoicesFromStore = this.$store.getters.getInvoices;
-      const startDate = new Date(this.rangeDates[0]);
-      const endDate = new Date(this.rangeDates[1]);
+      const startDate = new Date(
+        `${this.rangeDates[0]}T00:00:00Z`
+      ).toISOString();
+      const endDate = new Date(`${this.rangeDates[1]}T00:00:00Z`).toISOString();
       const filteredInvoices = invoicesFromStore.filter((invoice) => {
         if (invoice.invoice_date) {
-          const invoiceDate = new Date(invoice.invoice_date);
+          const invoiceDate = new Date(invoice.invoice_date).toISOString();
           return invoiceDate >= startDate && invoiceDate <= endDate;
         }
       });

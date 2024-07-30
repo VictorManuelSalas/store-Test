@@ -33,6 +33,7 @@ const getDefaultState = () => {
       },
     ],
     invoices: [],
+    payments: [],
     customersOdoo: [],
   };
 };
@@ -67,6 +68,9 @@ export default new Vuex.Store({
     setCustomersOdoo(state, customers) {
       state.customersOdoo = customers;
     },
+    setPayments(state, payments) {
+      state.payments = payments;
+    },
   },
   actions: {
     fetchUser({ commit }, userData) {
@@ -80,6 +84,9 @@ export default new Vuex.Store({
     },
     fetchInvoices({ commit }, userInvoices) {
       commit("setInvoices", userInvoices);
+    },
+    fetchPayments({ commit }, userPayments) {
+      commit("setPayments", userPayments);
     },
     updateItems({ commit, state }, userRole) {
       let itemUpdate = state.items;
@@ -105,6 +112,7 @@ export default new Vuex.Store({
     getItems: (state) => state.items,
     getInvoices: (state) => state.invoices,
     getCustomersOdoo: (state) => state.customersOdoo,
+    getPayments: (state) => state.payments,
   },
   modules: {},
 });

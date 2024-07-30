@@ -12,6 +12,7 @@ const auth = getAuth();
 
 const axios = require("axios");
 
+//Backend Functions
 const registerUserAndSendCredentials = async (data, token) => {
   try {
     console.log(data, token);
@@ -45,48 +46,6 @@ const registerUserAndSendCredentials = async (data, token) => {
     console.log("Error: ", error);
     return error;
   }
-};
-
-const logIn = async (email, password) => {
-  return await signInWithEmailAndPassword(auth, email, password)
-    .then((userCredential) => {
-      return userCredential.user;
-    })
-    .catch((error) => {
-      const errorMessage = error.message;
-      return errorMessage;
-    });
-};
-
-const logOut = async () => {
-  return await signOut(auth)
-    .then(() => {
-      return 200;
-    })
-    .catch((error) => {
-      const errorMessage = error.message;
-      return errorMessage;
-    });
-};
-
-const handleResetPassword = async (actionCode, newPassword) => {
-  return await verifyPasswordResetCode(auth, actionCode)
-    .then((email) => {
-      const accountEmail = email;
-      console.log(accountEmail);
-      confirmPasswordReset(auth, actionCode, newPassword)
-        .then((resp) => {
-          console.log("entre y si se cambio", resp);
-          return resp;
-        })
-        .catch((error) => {
-          console.log(error);
-          return error;
-        });
-    })
-    .catch((error) => {
-      return error.message;
-    });
 };
 
 const verifyEmail = async (customer) => {
@@ -128,6 +87,82 @@ const verifyEmail = async (customer) => {
   }
 };
 
+const changePasswordUser = async (user, auth) => {
+  try {
+    const resp = await axios
+      .put(
+        `https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/profile/changePassword`,
+        { user },
+        {
+          headers: {
+            Authorization: `Bearer ${auth.token}`,
+          },
+        }
+      )
+      .then((response) => {
+        console.log("respuesta", response.data);
+        return response.data;
+      })
+      .catch((error) => {
+        console.log("respuesta", error.response.status);
+        if (error.response.status === 403) {
+          throw new Error(403);
+        }
+        throw new Error(error.response.data.body.msg);
+      });
+
+    if (resp.error) {
+      return resp.body.msg;
+    }
+    return resp;
+  } catch (error) {
+    console.log("Error: ", error);
+    return error;
+  }
+};
+
+//Firebase
+const logIn = async (email, password) => {
+  return await signInWithEmailAndPassword(auth, email, password)
+    .then((userCredential) => {
+      return userCredential.user;
+    })
+    .catch((error) => {
+      const errorMessage = error.message;
+      return errorMessage;
+    });
+};
+
+const logOut = async () => {
+  return await signOut(auth)
+    .then(() => {
+      return 200;
+    })
+    .catch((error) => {
+      const errorMessage = error.message;
+      return errorMessage;
+    });
+};
+
+const handleResetPassword = async (actionCode, newPassword) => {
+  return await verifyPasswordResetCode(auth, actionCode)
+    .then((email) => {
+      const accountEmail = email;
+      console.log(accountEmail);
+      confirmPasswordReset(auth, actionCode, newPassword)
+        .then((resp) => {
+          return resp;
+        })
+        .catch((error) => {
+          console.log(error);
+          return error;
+        });
+    })
+    .catch((error) => {
+      return error.message;
+    });
+};
+
 const handleVerifyEmail = async (actionCode) => {
   return await applyActionCode(auth, actionCode)
     .then((resp) => {
@@ -139,6 +174,7 @@ const handleVerifyEmail = async (actionCode) => {
     });
 };
 
+//Google API
 const refreshToken = async (auth) => {
   try {
     const apiKey = auth.api_key;
@@ -180,4 +216,5 @@ export {
   handleVerifyEmail,
   verifyEmail,
   refreshToken,
+  changePasswordUser,
 };

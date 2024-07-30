@@ -269,6 +269,9 @@ export default {
         { text: "Actions", value: "actions", sortable: false, align: "center" },
       ];
     },
+    user() {
+      return this.$store.getters.getUser;
+    },
   },
   mounted() {
     this.getCustomers();
@@ -296,10 +299,10 @@ export default {
       const customersResponse = await getAllCustomers();
       if (customersResponse) {
         this.customers = customersResponse.filter(
-          (item) => item.archived === false
+          (item) => item.archived === false && item.id !== this.user.id
         );
         this.customersArchived = customersResponse.filter(
-          (item) => item.archived === true
+          (item) => item.archived === true && item.id !== this.user.id
         );
       }
       console.log(customersResponse);
@@ -323,7 +326,7 @@ export default {
       }
 
       if (response.resp) {
-       this.deleteLoader = false;
+        this.deleteLoader = false;
         this.dialogAttribute.hidde = true;
         this.getCustomers();
         return;
@@ -370,7 +373,7 @@ export default {
 
     async getCustomersOdoo() {
       console.log("obteniendo customers de odoo...");
-      const { auth } = this.$store.getters.getUser;
+      const { auth } = this.user;
       const data = await getAllCustomersOdoo(auth.token);
       console.log(data);
       if ("message" in data && data.message == 403) {
