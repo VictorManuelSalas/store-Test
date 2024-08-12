@@ -18,7 +18,7 @@ const registerUserAndSendCredentials = async (data, token) => {
     console.log(data, token);
     const resp = await axios
       .post(
-        `http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/customers/new`,
+        `https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/customers/new`,
         { user: data },
         {
           headers: {
@@ -57,7 +57,7 @@ const verifyEmail = async (customer) => {
     };
     const resp = await axios
       .post(
-        `http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/customers/sendVerificationEmail`,
+        `https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/customers/sendVerificationEmail`,
         { customer: data },
         {
           headers: {
@@ -91,7 +91,7 @@ const changePasswordUser = async (user, auth) => {
   try {
     const resp = await axios
       .put(
-        `http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/profile/changePassword`,
+        `https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/profile/changePassword`,
         { user },
         {
           headers: {
