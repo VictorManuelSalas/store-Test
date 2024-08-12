@@ -1,13 +1,7 @@
 <template>
   <div>
-    <v-alert
-      max-width="400"
-      class="mx-auto"
-      type="error"
-      :value="alert.value"
-      icon="mdi-security"
-      transition="scale-transition"
-    >
+    <v-alert max-width="400" class="mx-auto" type="error" :value="alert.value" icon="mdi-security"
+      transition="scale-transition">
       {{ alert.text }}
     </v-alert>
 
@@ -16,7 +10,9 @@
         <v-progress-linear height="5" indeterminate></v-progress-linear>
       </template>
 
-      <v-img height="150" src="../assets/background.jpg"></v-img>
+      <div id="contenier-header-logo">
+        <v-img id="img-logo" src="../assets/SmartStore 2016 Logo.png"></v-img>
+      </div>
 
       <v-card-title class="pl-7">
         <h2>Log In</h2>
@@ -26,23 +22,10 @@
           <v-container>
             <v-row>
               <v-col cols="12">
-                <v-text-field
-                  v-model="email"
-                  :rules="emailRules"
-                  label="E-mail"
-                  required
-                  filled
-                ></v-text-field
-                ><v-text-field
-                  filled
-                  v-model="password"
-                  :rules="passwordRules"
-                  label="Password"
-                  required
-                  :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
-                  :type="show1 ? 'text' : 'password'"
-                  @click:append="show1 = !show1"
-                ></v-text-field>
+                <v-text-field v-model="email" :rules="emailRules" label="E-mail" required
+                  filled></v-text-field><v-text-field filled v-model="password" :rules="passwordRules" label="Password"
+                  required :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :type="show1 ? 'text' : 'password'"
+                  @click:append="show1 = !show1"></v-text-field>
               </v-col>
             </v-row>
             <a @click="$router.push('/auth/process')">Forgot your password?</a>
@@ -54,13 +37,7 @@
         <v-row align="center">
           <v-col cols="12" sm="12">
             <div id="btns_actions">
-              <v-btn
-                block
-                color="primary"
-                large
-                :disabled="!valid"
-                @click="logInProcess(email, password)"
-              >
+              <v-btn block color="primary" large :disabled="!valid" @click="logInProcess(email, password)">
                 Log in
               </v-btn>
               <!-- <v-btn
@@ -133,9 +110,20 @@ export default {
             token: loginResponse.stsTokenManager.accessToken,
             refreshToken: loginResponse.stsTokenManager.refreshToken,
             account_verified: loginResponse.emailVerified,
+            passwordDefaultChanged: await this.passwordVerify(loginResponse.reloadUserInfo)
           },
           ...user,
         });
+        console.log({
+          auth: {
+            api_key: loginResponse.auth.config.apiKey,
+            token: loginResponse.stsTokenManager.accessToken,
+            refreshToken: loginResponse.stsTokenManager.refreshToken,
+            account_verified: loginResponse.emailVerified,
+            passwordDefaultChanged: await this.passwordVerify(loginResponse.reloadUserInfo)
+          },
+          ...user,
+        })
         this.$store.dispatch("updateItems", user.role);
         this.loading = false;
         this.$router.push("/home");
@@ -153,7 +141,22 @@ export default {
       }
       return userData[0];
     },
+    async passwordVerify(reloadUserInfo) {
+      const { createdAt, passwordUpdatedAt } = reloadUserInfo;
+
+      const createdAtMillis = parseInt(createdAt, 10);
+      const passwordUpdatedAtMillis = parseInt(passwordUpdatedAt, 10);
+
+      const createdAt_date = new Date(createdAtMillis);
+      const passwordUpdatedAt_date = new Date(passwordUpdatedAtMillis);
+
+      const areEqual = createdAt_date.getTime() !== passwordUpdatedAt_date.getTime();
+
+      console.log({ createdAt_date, passwordUpdatedAt_date, test: areEqual });
+      return areEqual;
+    }
   },
+
 };
 </script>
 
@@ -163,12 +166,32 @@ export default {
   height: fit-content;
   max-width: 380px;
   width: 100%;
+
+  h2 {
+    color: black;
+  }
+
+  #contenier-header-logo {
+    // background-image: url('../assets/background3.jpg');
+    // background-size: cover;
+    // background-position: center;
+    // background-repeat: no-repeat; 
+    padding: 20px;
+
+    #img-logo {
+      filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.7));
+      width: 300px;
+      margin: auto;
+    }
+  }
 }
+
 #btns_actions {
   display: flex;
   gap: 10px;
   flex-direction: column;
 }
+
 @media (max-width: 382px) {
   #container {
     margin: auto;

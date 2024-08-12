@@ -4,7 +4,7 @@ const getAllCustomersOdoo = async (token) => {
   try {
     const resp = await axios
       .get(
-        `https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/odoo/customers`,
+        `http://127.0.0.1:5001/smartstore-90c07/us-central1/app/api/v1/odoo/customers`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

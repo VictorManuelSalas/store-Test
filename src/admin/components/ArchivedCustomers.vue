@@ -2,7 +2,7 @@
   <main class="text-center">
     <v-bottom-sheet id="btn-archived" v-model="sheet" scrollable>
       <template v-slot:activator="{ on, attrs }">
-        <v-btn text v-bind="attrs" large v-on="on">
+        <v-btn  text v-bind="attrs" large v-on="on" min-width="100%">
           <svg
             class="icons-actions"
             v-bind="attrs"
@@ -129,6 +129,7 @@ main {
       color: white;
       box-shadow: rgba(108, 106, 106, 0.71) 0px 2px 8px 0px;
     }
+ 
   }
 }
 </style>

@@ -12,48 +12,32 @@
           customer?
         </p>
         <span>
-          <button
-            id="close-dialog"
-            @click="dialogAttribute.hidde = !dialogAttribute.hidde"
-          >
+          <button id="close-dialog" @click="dialogAttribute.hidde = !dialogAttribute.hidde">
             Cancel
           </button>
-          <button
-            id="accept-dialog"
-            :disabled="dialogAttribute.item ? false : true"
-            @click="
-              dialogAttribute.type === 'delete'
-                ? deleteCustomer()
-                : archiveCustomer()
-            "
-          >
-            {{ deleteLoader ? "Loading..." : "Acept" }}
+          <button id="accept-dialog" :disabled="dialogAttribute.item ? false : true" @click="
+            dialogAttribute.type === 'delete'
+              ? deleteCustomer()
+              : archiveCustomer()
+            ">
+            {{ deleteLoader ? "Loading..." : "Accept" }}
           </button>
         </span>
       </div>
     </div>
 
     <div v-if="alert.value">
-      <v-alert
-        prominent
-        :type="
-          alert.method === 'info'
-            ? 'info'
-            : alert.method === 'warning'
-            ? 'warning'
-            : 'error'
-        "
-        :value="alert.value"
-        transition="scale-transition"
-        :icon="
-          alert.method === 'info'
-            ? 'mdi-account-check'
-            : alert.method === 'warning'
+      <v-alert prominent :type="alert.method === 'info'
+        ? 'info'
+        : alert.method === 'warning'
+          ? 'warning'
+          : 'error'
+        " :value="alert.value" transition="scale-transition" :icon="alert.method === 'info'
+          ? 'mdi-account-check'
+          : alert.method === 'warning'
             ? 'mdi-account-alert'
             : 'mdi-account-remove'
-        "
-        id="alert"
-      >
+          " id="alert">
         <v-row align="center">
           <v-col class="grow">
             {{ alert.text }}
@@ -63,54 +47,36 @@
     </div>
     <div>
       <span id="title-view">
-        <v-btn
-          id="btn"
-          color="warning"
-          elevation="5"
-          large
-          :loading="loadingOdooCustomers"
-          :disabled="adminOptionsEnabled"
-          @click="$router.push('/home/create-user')"
-          >New User
-          <template v-slot:loader>
-            <span>Loading...</span>
-          </template>
-        </v-btn>
         <section>
-          <h1 class="ml-5">Customers</h1>
-          <ArchivedCustomers
-            v-if="customersArchived.length > 0"
-            :customers="customersArchived"
-            @unarchiveCustomer="unarchiveCustomer"
-          />
+          <v-btn id="btn" color="warning" elevation="5" large :loading="loadingOdooCustomers"
+            :disabled="adminOptionsEnabled" @click="$router.push('/home/create-user')">New User
+            <template v-slot:loader>
+              <span>Loading...</span>
+            </template>
+          </v-btn>
+        </section>
+
+        <section>
+          <h1>Customers</h1>
+          <ArchivedCustomers v-if="customersArchived.length > 0" :customers="customersArchived"
+            @unarchiveCustomer="unarchiveCustomer" />
         </section>
       </span>
-      <v-data-table
-        id="table"
-        :headers="headers"
-        :items="customers"
-        item-key="customers.name"
-        class="elevation-1"
-        :search="search"
-        :loading="customers.length == 0 && customerProcessSearch"
-        loading-text="Loading... Please wait"
-      >
+      <v-data-table id="table" :headers="headers" :items="customers" item-key="customers.name" class="elevation-1"
+        :search="search" :loading="customers.length == 0 && customerProcessSearch"
+        loading-text="Loading... Please wait">
         <template v-slot:item.firstname="{ item }">
           <router-link :to="`/home/user/${item.id}`">
-            {{ item.firstname }}</router-link
-          >
+            {{ item.firstname }}</router-link>
         </template>
         <template v-slot:item.accountID="{ item }">
-          <p
-            :style="
-              item.accountID.length > 0 ? 'color: black;' : 'opacity: 0.5;'
-            "
-          >
+          <p :style="item.accountID.length > 0 ? 'color: black;' : 'opacity: 0.5;'
+            ">
             {{ item.accountID.length > 0 ? item.accountID.join(", ") : "null" }}
           </p>
         </template>
         <template v-slot:item.role="{ item }">
-          <v-chip :color="item.role === 'admin' ? 'green' : 'orange'" dark>
+          <v-chip :color="item.role === 'Admin' ? 'green' : 'orange'" dark>
             {{ item.role }}
           </v-chip>
         </template>
@@ -118,55 +84,29 @@
         <template v-slot:item.actions="{ item }">
           <v-tooltip top max-width="fit-content" color="orange">
             <template v-slot:activator="{ on, attrs }">
-              <svg
-                class="icons-actions"
-                v-bind="attrs"
-                v-on="on"
-                xmlns="http://www.w3.org/2000/svg"
-                height="24px"
-                viewBox="0 0 24 24"
-                width="24px"
-                fill="#000000"
-                @click="
+              <svg class="icons-actions" v-bind="attrs" v-on="on" xmlns="http://www.w3.org/2000/svg" height="24px"
+                viewBox="0 0 24 24" width="24px" fill="#000000" @click="
                   dialogAttribute = {
                     item: item.id,
                     hidde: false,
                     type: 'archive',
                   }
-                "
-              >
+                  ">
                 <path d="M0 0h24v24H0V0z" fill="none" />
                 <path
-                  d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zm-8.89 11.92L6.5 12H10v-2h4v2h3.5l-5.15 5.15c-.19.19-.51.19-.7 0zM5.12 5l.81-1h12l.94 1H5.12z"
-                />
+                  d="M20.54 5.23l-1.39-1.68C18.88 3.21 18.47 3 18 3H6c-.47 0-.88.21-1.16.55L3.46 5.23C3.17 5.57 3 6.02 3 6.5V19c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6.5c0-.48-.17-.93-.46-1.27zm-8.89 11.92L6.5 12H10v-2h4v2h3.5l-5.15 5.15c-.19.19-.51.19-.7 0zM5.12 5l.81-1h12l.94 1H5.12z" />
               </svg>
             </template>
             <span>Archive</span>
           </v-tooltip>
-          <v-tooltip
-            top
-            max-width="fit-content"
-            color="amber"
-            v-if="!adminOptionsEnabled"
-          >
+          <v-tooltip top max-width="fit-content" color="amber" v-if="!adminOptionsEnabled">
             <template v-slot:activator="{ on, attrs }">
-              <router-link
-                :to="{ name: 'update-user', params: { customerData: item } }"
-              >
-                <svg
-                  class="icons-actions"
-                  v-bind="attrs"
-                  v-on="on"
-                  xmlns="http://www.w3.org/2000/svg"
-                  height="24px"
-                  viewBox="0 0 24 24"
-                  width="24px"
-                  fill="#000000"
-                >
+              <router-link :to="{ name: 'update-user', params: { customerData: item } }">
+                <svg class="icons-actions" v-bind="attrs" v-on="on" xmlns="http://www.w3.org/2000/svg" height="24px"
+                  viewBox="0 0 24 24" width="24px" fill="#000000">
                   <path d="M0 0h24v24H0V0z" fill="none" />
                   <path
-                    d="M3 17.46v3.04c0 .28.22.5.5.5h3.04c.13 0 .26-.05.35-.15L17.81 9.94l-3.75-3.75L3.15 17.1c-.1.1-.15.22-.15.36zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                  />
+                    d="M3 17.46v3.04c0 .28.22.5.5.5h3.04c.13 0 .26-.05.35-.15L17.81 9.94l-3.75-3.75L3.15 17.1c-.1.1-.15.22-.15.36zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z" />
                 </svg>
               </router-link>
             </template>
@@ -174,27 +114,17 @@
           </v-tooltip>
           <v-tooltip top max-width="fit-content" color="red">
             <template v-slot:activator="{ on, attrs }">
-              <svg
-                class="icons-actions"
-                v-bind="attrs"
-                v-on="on"
-                xmlns="http://www.w3.org/2000/svg"
-                height="24px"
-                viewBox="0 0 24 24"
-                width="24px"
-                fill="#000000"
-                @click="
+              <svg class="icons-actions" v-bind="attrs" v-on="on" xmlns="http://www.w3.org/2000/svg" height="24px"
+                viewBox="0 0 24 24" width="24px" fill="#000000" @click="
                   dialogAttribute = {
                     item: item,
                     hidde: false,
                     type: 'delete',
                   }
-                "
-              >
+                  ">
                 <path d="M0 0h24v24H0V0z" fill="none" />
                 <path
-                  d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v10zM18 4h-2.5l-.71-.71c-.18-.18-.44-.29-.7-.29H9.91c-.26 0-.52.11-.7.29L8.5 4H6c-.55 0-1 .45-1 1s.45 1 1 1h12c.55 0 1-.45 1-1s-.45-1-1-1z"
-                />
+                  d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V9c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v10zM18 4h-2.5l-.71-.71c-.18-.18-.44-.29-.7-.29H9.91c-.26 0-.52.11-.7.29L8.5 4H6c-.55 0-1 .45-1 1s.45 1 1 1h12c.55 0 1-.45 1-1s-.45-1-1-1z" />
               </svg>
             </template>
             <span>Delete</span>
@@ -202,14 +132,8 @@
         </template>
 
         <template v-slot:top>
-          <v-text-field
-            v-model="search"
-            append-icon="mdi-magnify"
-            label="Search"
-            single-line
-            hide-details
-            solo
-          ></v-text-field>
+          <v-text-field v-model="search" append-icon="mdi-magnify" label="Search" single-line hide-details
+            solo></v-text-field>
         </template>
       </v-data-table>
     </div>
@@ -296,13 +220,20 @@ export default {
     },
     async getCustomers() {
       console.log("obteniendo usuarios...");
-      const customersResponse = await getAllCustomers();
+      let customersResponse = await getAllCustomers();
       if (customersResponse) {
+
+        customersResponse = customersResponse.map(customer => {
+          const role = customer.role === "admin" ? "Admin" : customer.role === "client" ? "Client" : customer.role;
+          return { ...customer, role };
+        });
+
+
         this.customers = customersResponse.filter(
-          (item) => item.archived === false && item.id !== this.user.id
+          (item) => item.archived === false //&& item.id !== this.user.id
         );
         this.customersArchived = customersResponse.filter(
-          (item) => item.archived === true && item.id !== this.user.id
+          (item) => item.archived === true //&& item.id !== this.user.id
         );
       }
       console.log(customersResponse);
@@ -410,19 +341,27 @@ div {
   flex-direction: column;
   gap: 25px;
   padding: 20px;
-  #title-view {
-    display: flex;
-    align-items: center;
+
+  #title-view {    
+    display: flex; 
+    padding: 0%;
+    justify-content: space-between;
     flex-direction: row-reverse;
+
     section {
       h1 {
+        width: 100%;
+        padding: 0px;
+        margin: 0px;
         font-size: 2rem;
-      }
+
+        #btn {
+          width: fit-content; 
+        }
+      } 
     }
-    #btn {
-      width: fit-content;
-      margin-left: auto;
-    }
+
+
   }
 
   #table {
@@ -455,6 +394,7 @@ div {
     span {
       display: flex;
       justify-content: space-around;
+
       button {
         padding: 10px 30px;
         border: none;
@@ -462,6 +402,7 @@ div {
         color: white;
         cursor: pointer;
         background-color: #0056b3;
+
         &:hover {
           opacity: 0.9;
         }
@@ -469,6 +410,7 @@ div {
 
       #close-dialog {
         background-color: #9d9d9d;
+
         &:hover {
           opacity: 0.9;
         }
@@ -479,5 +421,20 @@ div {
 
 .icons-actions {
   cursor: pointer;
+}
+
+@media only screen and (max-width: 350px) {
+  #title-view {
+    display: flex; 
+    flex-direction: column-reverse !important; 
+    section {
+      width: 100%;
+      text-align: center;
+      #btn {
+        width: 100% !important;
+        margin-left: auto;
+      }
+    }
+  }
 }
 </style>

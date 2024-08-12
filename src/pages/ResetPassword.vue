@@ -1,28 +1,20 @@
 <template>
   <div v-if="!firebaseVerificationData">
-    <v-alert
-      prominent
-      :type="alert.method === 'info' ? 'info' : 'error'"
-      :value="alert.value"
-      transition="scale-transition"
-      icon="mdi-email"
-    >
+    <v-alert prominent :type="alert.method === 'info' ? 'info' : 'error'" :value="alert.value"
+      transition="scale-transition" icon="mdi-email">
       <v-row align="center">
         <v-col class="grow">
           {{ alert.text }}
         </v-col>
         <v-col class="shrink">
-          <v-btn
-            @click="
-              (alert.method === 'info' ? $router.push('/') : null) +
-                (alert = {
-                  value: false,
-                  text: '',
-                  method: '',
-                })
-            "
-            >Understand</v-btn
-          >
+          <v-btn @click="
+            (alert.method === 'info' ? $router.push('/') : null) +
+            (alert = {
+              value: false,
+              text: '',
+              method: '',
+            })
+            ">Understand</v-btn>
         </v-col>
       </v-row>
     </v-alert>
@@ -44,37 +36,19 @@
           <v-container>
             <v-row>
               <v-col cols="12" md="12" ms="4">
-                <v-text-field
-                  v-model="email"
-                  :rules="emailRules"
-                  label="E-mail"
-                  required
-                  filled
-                  append-icon="mdi-account-search"
-                  @click:append="getUserAccount()"
-                ></v-text-field>
+                <v-text-field v-model="email" :rules="emailRules" label="E-mail" required filled
+                  append-icon="mdi-account-search" @click:append="getUserAccount()"></v-text-field>
               </v-col>
-              <v-col
-                cols="12"
-                md="12"
-                ms="4"
-                v-if="users.length > 0 && users[0] !== false"
-              >
+              <v-col cols="12" md="12" ms="4" v-if="users.length > 0 && users[0] !== false">
                 <b class="mx-auto">Select an user</b>
                 <v-radio-group v-model="userAccount">
-                  <v-radio
-                    v-for="user in users"
-                    :key="user.email"
-                    :label="`${user.firstname} ${user.lastname}`"
-                    :value="user"
-                  >
+                  <v-radio v-for="user in users" :key="user.email" :label="`${user.firstname} ${user.lastname}`"
+                    :value="user">
                   </v-radio>
                 </v-radio-group>
               </v-col>
               <v-col cols="12" md="12" ms="4" v-else-if="users[0] === false">
-                <b class="mx-auto my-12 alert-notfound"
-                  >No account was found with that email address.</b
-                >
+                <b class="mx-auto my-12 alert-notfound">No account was found with that email address.</b>
               </v-col>
             </v-row>
           </v-container>
@@ -87,12 +61,7 @@
               <v-btn color="warning" large dark text @click="$router.push('/')">
                 Cancel
               </v-btn>
-              <v-btn
-                color="primary"
-                large
-                :disabled="!userAccount"
-                @click="sendEmail()"
-              >
+              <v-btn color="primary" large :disabled="!userAccount" @click="sendEmail()">
                 Send Email
               </v-btn>
             </div>
@@ -103,26 +72,18 @@
   </div>
 
   <div v-else-if="mode === 'resetPassword'">
-    <v-alert
-      prominent
-      :type="alert.method === 'info' ? 'info' : 'error'"
-      :value="alert.value"
-      transition="scale-transition"
-      icon="mdi-email"
-    >
+    <v-alert prominent :type="alert.method === 'info' ? 'info' : 'error'" :value="alert.value"
+      transition="scale-transition" icon="mdi-email">
       <v-row align="center">
         <v-col class="grow">
           {{ alert.text }}
         </v-col>
         <v-col class="shrink">
-          <v-btn
-            @click="
-              alert.method === 'info'
-                ? $router.push('/')
-                : $router.push('/reset-password') + (alert.value = false)
-            "
-            >Understand</v-btn
-          >
+          <v-btn @click="
+            alert.method === 'info'
+              ? $router.push('/')
+              : $router.push('/auth/process') + (alert.value = false)
+            ">Understand</v-btn>
         </v-col>
       </v-row>
     </v-alert>
@@ -144,29 +105,14 @@
           <v-container>
             <v-row>
               <v-col cols="12" md="12" ms="4">
-                <v-text-field
-                  v-model="passwordData.newPassword"
-                  :rules="passwordRule"
-                  :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'"
-                  :type="show1 ? 'text' : 'password'"
-                  name="New Password"
-                  label="New Password"
-                  hint="At least 8 characters"
-                  counter
-                  filled
-                  @click:append="show1 = !show1"
-                ></v-text-field>
+                <v-text-field v-model="passwordData.newPassword" :rules="passwordRule"
+                  :append-icon="show1 ? 'mdi-eye' : 'mdi-eye-off'" :type="show1 ? 'text' : 'password'"
+                  name="New Password" label="New Password" hint="At least 8 characters" counter filled
+                  @click:append="show1 = !show1"></v-text-field>
               </v-col>
               <v-col cols="12" md="12" ms="4">
-                <v-text-field
-                  v-model="passwordData.verificationPassword"
-                  type="text"
-                  name="Verification Password"
-                  label="Verification Password"
-                  hint="At least 8 characters"
-                  counter
-                  filled
-                ></v-text-field>
+                <v-text-field v-model="passwordData.verificationPassword" type="text" name="Verification Password"
+                  label="Verification Password" hint="At least 8 characters" counter filled></v-text-field>
               </v-col>
             </v-row>
           </v-container>
@@ -179,12 +125,7 @@
               <v-btn color="warning" large dark text @click="$router.push('/')">
                 Cancel
               </v-btn>
-              <v-btn
-                color="primary"
-                large
-                :disabled="!verificationPasswordRule || !valid"
-                @click="chagePassword()"
-              >
+              <v-btn color="primary" large :disabled="!verificationPasswordRule || !valid" @click="chagePassword()">
                 Save
               </v-btn>
             </div>
@@ -195,26 +136,18 @@
   </div>
 
   <div v-else>
-    <v-alert
-      prominent
-      :type="alert.method === 'info' ? 'info' : 'error'"
-      :value="alert.value"
-      transition="scale-transition"
-      icon="mdi-email"
-    >
+    <v-alert prominent :type="alert.method === 'info' ? 'info' : 'error'" :value="alert.value"
+      transition="scale-transition" icon="mdi-email">
       <v-row align="center">
         <v-col class="grow">
           {{ alert.text }}
         </v-col>
         <v-col class="shrink">
-          <v-btn
-            @click="
-              alert.method === 'info'
-                ? $router.push('/')
-                : $router.push('/reset-password') + (alert.value = false)
-            "
-            >Understand</v-btn
-          >
+          <v-btn @click="
+            alert.method === 'info'
+              ? $router.push('/')
+              : $router.push('/auth/process') + (alert.value = false)
+            ">Understand</v-btn>
         </v-col>
       </v-row>
     </v-alert>
@@ -313,7 +246,7 @@ export default {
       return false;
     },
   },
-  mounted() {},
+  mounted() { },
   methods: {
     async sendEmail() {
       this.loading = true;
@@ -401,6 +334,7 @@ div {
   margin: auto;
   width: clamp(300px, 100%, 800px);
 }
+
 #btns_actions {
   display: flex;
   gap: 10px;
