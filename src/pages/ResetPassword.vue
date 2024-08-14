@@ -145,7 +145,7 @@
         <v-col class="shrink">
           <v-btn @click="
             alert.method === 'info'
-              ? $router.push('/')
+              ? closeWindow()
               : $router.push('/auth/process') + (alert.value = false)
             ">Understand</v-btn>
         </v-col>
@@ -248,6 +248,10 @@ export default {
   },
   mounted() { },
   methods: {
+    closeWindow() {
+      window.close()
+    },
+
     async sendEmail() {
       this.loading = true;
 
@@ -272,6 +276,7 @@ export default {
 
       this.loading = false;
     },
+
     async getUserAccount() {
       this.loading = true;
       const clientData = await getUserByEmail(this.email);

@@ -2,21 +2,21 @@ const axios = require("axios");
 
 const getInvoicesUser = async (usersId, token) => {
   try {
-     
+
     const resp = await axios
       .get(
-        `https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/odoo/getInvoices/${usersId}`,
+        `${process.env.VUE_APP_Firebase_URL_API}/api/v1/odoo/getInvoices/${usersId}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
           },
         }
       )
-      .then((response) => { 
+      .then((response) => {
         return response.data;
       })
       .catch((error) => {
-         
+
         if (error.response.status === 403) {
           throw new Error(403);
         }
@@ -27,7 +27,7 @@ const getInvoicesUser = async (usersId, token) => {
       return resp.body.msg;
     }
     return resp.body.invoices;
-  } catch (error) { 
+  } catch (error) {
     return error;
   }
 };
@@ -35,8 +35,7 @@ const getInvoicesUser = async (usersId, token) => {
 const downloadInvoice = async (invoice, token) => {
   try {
     const { name } = invoice;
-    const response = await axios.post(
-      "https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/odoo/downloadInvoice",
+    const response = await axios.post(`${process.env.VUE_APP_Firebase_URL_API}/api/v1/odoo/downloadInvoice`,
       invoice,
       {
         headers: {
@@ -63,8 +62,7 @@ const downloadInvoice = async (invoice, token) => {
 
 const openInvoiceView = async (invoice, token) => {
   try {
-    const response = await axios.post(
-      "https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/odoo/openInvoice",
+    const response = await axios.post(`${process.env.VUE_APP_Firebase_URL_API}/api/v1/odoo/openInvoice`,
       invoice,
       {
         headers: {

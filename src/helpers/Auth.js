@@ -18,7 +18,7 @@ const registerUserAndSendCredentials = async (data, token) => {
     console.log(data, token);
     const resp = await axios
       .post(
-        `https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/customers/new`,
+        `${process.env.VUE_APP_Firebase_URL_API}/api/v1/customers/new`,
         { user: data },
         {
           headers: {
@@ -57,7 +57,7 @@ const verifyEmail = async (customer) => {
     };
     const resp = await axios
       .post(
-        `https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/customers/sendVerificationEmail`,
+        `${process.env.VUE_APP_Firebase_URL_API}/api/v1/customers/sendVerificationEmail`,
         { customer: data },
         {
           headers: {
@@ -91,7 +91,7 @@ const changePasswordUser = async (user, auth) => {
   try {
     const resp = await axios
       .put(
-        `https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/profile/changePassword`,
+        `${process.env.VUE_APP_Firebase_URL_API}/api/v1/profile/changePassword`,
         { user },
         {
           headers: {

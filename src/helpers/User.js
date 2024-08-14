@@ -4,8 +4,7 @@ import {
   addDoc,
   Timestamp,
   doc,
-  setDoc,
-  deleteDoc,
+  setDoc
 } from "firebase/firestore";
 
 import {
@@ -92,7 +91,7 @@ const deleteUser = async (id, imgDelete, token) => {
 
     const resp = await axios
       .delete(
-        `https://us-central1-smartstore-90c07.cloudfunctions.net/app/api/v1/customers/${id}`,
+        `${process.env.VUE_APP_Firebase_URL_API}/api/v1/customers/${id}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -2,7 +2,7 @@
   <Loader v-if="loader" />
   <main v-else>
 
-    <HeaderSection />
+    <HeaderSection ref="headerFunctions" />
     <section>
       <v-alert icon="mdi-account-alert" text color="deep-orange" v-model="alertShow">
         <h3 class="text-h8">Account Alert</h3>
@@ -81,7 +81,6 @@ import Loader from "@/components/Loader.vue";
 import HeaderSection from "@/components/HeaderSection.vue";
 import { verifyEmail } from "../helpers/Auth";
 import ChangePassword from "@/components/ChangePassword.vue";
-
 export default {
   components: {
     Loader,
@@ -128,6 +127,7 @@ export default {
     this.alertStructureBuild()
   },
   methods: {
+
     alertProcess(message) {
       console.log(message)
       this.$refs.changePassword.dialog = false;
@@ -137,18 +137,20 @@ export default {
         method: message.method,
       };
 
-      console.log('tets', this.verifyAccountOptions, message.text === 'info')
+      console.log('tets', this.verifyAccountOptions, message.method === 'info')
       if (message.method === 'info') {
-        this.disableFuncions = false
-        this.verifyAccountOptions.shift()
-        if (!this.verifyAccountOptions.length) {
-          this.verifyAccountOptions.unshift({
-            name: '',
-            functionName: '',
-            text: '',
-            btn: ''
-          })
-        }
+        this.$refs.headerFunctions.loginOut();
+        // this.disableFuncions = false
+        // this.verifyAccountOptions.shift()
+        // if (!this.verifyAccountOptions.length) {
+        //   this.verifyAccountOptions.unshift({
+        //     name: '',
+        //     functionName: '',
+        //     text: '',
+        //     btn: ''
+        //   })
+        // }
+         
 
       }
       setTimeout(() => {
@@ -187,7 +189,7 @@ export default {
     },
 
     async changePassword() {
-      this.$refs.changePassword.dialog = true;
+      this.$refs.changePassword.dialog = true; 
     },
 
 

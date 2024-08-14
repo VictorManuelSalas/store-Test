@@ -196,6 +196,9 @@ export default {
       this.isLaptopOrPc = width >= 1024;
       this.isTabletOrMobile = width < 1024;
     },
+    test(){
+      console.log('testinggg')
+    }
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);
