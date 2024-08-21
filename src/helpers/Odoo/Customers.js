@@ -12,11 +12,11 @@ const getAllCustomersOdoo = async (token) => {
         }
       )
       .then((response) => {
-        console.log("respuesta", response);
+        // console.log("respuesta", response);
         return response.data;
       })
       .catch((error) => {
-        console.log("respuesta", error.response.status);
+        console.error("error", error.response.status);
         if (error.response.status === 403) {
           throw new Error(403);
         }
@@ -28,7 +28,7 @@ const getAllCustomersOdoo = async (token) => {
     }
     return resp.body.customers;
   } catch (error) {
-    console.log("Error: ", error);
+    console.error("Error: ", error);
     return error;
   }
 };

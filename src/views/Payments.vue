@@ -322,8 +322,7 @@ export default {
     },
 
     cleanFilterRangeDate() {
-      this.rangeDates = [];
-      console.log(this.$store.getters.getPayments);
+      this.rangeDates = []; 
       const paymentsFromStore = this.$store.getters.getPayments;
       this.payments = Array.isArray(paymentsFromStore) ? paymentsFromStore : [];
     },

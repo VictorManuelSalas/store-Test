@@ -1,5 +1,7 @@
 import Vue from "vue";
 import Vuex from "vuex";
+import createPersistedState from 'vuex-persistedstate';
+import Cookies from 'js-cookie';
 
 Vue.use(Vuex);
 
@@ -15,14 +17,6 @@ const getDefaultState = () => {
         },
         color: "#72b7e7",
       },
-      // {
-      //   title: "Payments",
-      //   url: "/home/payments",
-      //   icon: {
-      //     path: "M80-480q0 68 34 124.5t91 86.5q14 8 20.5 23t.5 30q-6 16-21 23t-29-1Q98-234 49-309.5T0-480q0-94 47.5-169T172-764q14-8 29.5-1.5T224-743q7 14 1 29t-20 23q-57 30-91 86.5T80-480Zm480 320q-133 0-226.5-93.5T240-480q0-133 93.5-226.5T560-800q56 0 106 18t91 50q13 10 13 26t-12 28q-11 11-27.5 12t-30.5-9q-30-22-65.5-33.5T560-720q-100 0-170 70t-70 170q0 100 70 170t170 70q39 0 74.5-11.5T700-285q14-10 30.5-9t27.5 12q12 12 12 28t-13 26q-41 32-91 50t-106 18Zm248-280H560q-17 0-28.5-11.5T520-480q0-17 11.5-28.5T560-520h248l-36-36q-11-11-11-28t11-28q11-11 28-11t28 11l104 104q12 12 12 28t-12 28L828-348q-11 11-28 11t-28-11q-11-11-11-28t11-28l36-36Z",
-      //   },
-      //   color: "#d6bc7f",
-      // },
       {
         title: "Profile",
         url: "/home/profile",
@@ -52,7 +46,6 @@ export default new Vuex.Store({
       }
       state.user = user;
     },
-
     setTokens(state, token) {
       state.user.auth.token = token;
     },
@@ -71,6 +64,9 @@ export default new Vuex.Store({
     setPayments(state, payments) {
       state.payments = payments;
     },
+    clearCookies() {
+      Cookies.remove('vuex');
+    },
   },
   actions: {
     fetchUser({ commit }, userData) {
@@ -88,24 +84,25 @@ export default new Vuex.Store({
     fetchPayments({ commit }, userPayments) {
       commit("setPayments", userPayments);
     },
-    updateItems({ commit, state }, userRole) {
-      let itemUpdate = state.items;
+    // updateItems({ commit, state }, userRole) {
+    //   let itemUpdate = [...state.items]; // Clone items array
 
-      if (userRole === "admin") {
-        state.items.push({
-          title: "Admin",
-          url: "/home/admin",
-          icon: {
-            path: "M680-280q25 0 42.5-17.5T740-340q0-25-17.5-42.5T680-400q-25 0-42.5 17.5T620-340q0 25 17.5 42.5T680-280Zm0 120q31 0 57-14.5t42-38.5q-22-13-47-20t-52-7q-27 0-52 7t-47 20q16 24 42 38.5t57 14.5ZM480-874q8 0 14.5 1t13.5 4l240 90q23 9 37.5 29t14.5 45v125q0 17-11.5 28.5T760-540q-17 0-28.5-11.5T720-580v-124l-240-90-240 90v188q0 50 14.5 100t40 95q25.5 45 62 81t79.5 59q15 8 21.5 23t.5 30q-7 16-22.5 22t-30.5-2q-113-56-179-169t-66-239v-189q0-25 14.5-45t37.5-29l240-90q7-3 14-4t14-1ZM680-80q-83 0-141.5-58.5T480-280q0-83 58.5-141.5T680-480q83 0 141.5 58.5T880-280q0 83-58.5 141.5T680-80ZM480-494Z",
-          },
-          color: "#70d7e0",
-        });
-      }
-      commit("setItems", itemUpdate);
-    },
+    //   if (userRole === "admin") {
+    //     itemUpdate.push({
+    //       title: "Admin",
+    //       url: "/home/admin",
+    //       icon: {
+    //         path: "M680-280q25 0 42.5-17.5T740-340q0-25-17.5-42.5T680-400q-25 0-42.5 17.5T620-340q0 25 17.5 42.5T680-280Zm0 120q31 0 57-14.5t42-38.5q-22-13-47-20t-52-7q-27 0-52 7t-47 20q16 24 42 38.5t57 14.5ZM480-874q8 0 14.5 1t13.5 4l240 90q23 9 37.5 29t14.5 45v125q0 17-11.5 28.5T760-540q-17 0-28.5-11.5T720-580v-124l-240-90-240 90v188q0 50 14.5 100t40 95q25.5 45 62 81t79.5 59q15 8 21.5 23t.5 30q-7 16-22.5 22t-30.5-2q-113-56-179-169t-66-239v-189q0-25 14.5-45t37.5-29l240-90q7-3 14-4t14-1ZM680-80q-83 0-141.5-58.5T480-280q0-83 58.5-141.5T680-480q83 0 141.5 58.5T880-280q0 83-58.5 141.5T680-80ZM480-494Z",
+    //       },
+    //       color: "#70d7e0",
+    //     });
+    //   }
+    //   commit("setItems", itemUpdate);
+    // },
     resetStore({ commit }) {
       commit("RESET_STATE");
-    },
+      commit("clearCookies");
+    }
   },
   getters: {
     getUser: (state) => state.user,
@@ -115,4 +112,18 @@ export default new Vuex.Store({
     getPayments: (state) => state.payments,
   },
   modules: {},
+  plugins: [ 
+    createPersistedState({
+      storage: {
+        getItem: key => Cookies.get(key),
+        setItem: (key, value) => Cookies.set(key, value, {
+          expires: 1,  
+          secure: true,  
+          sameSite: 'Strict',  
+        }),
+        removeItem: key => Cookies.remove(key)
+      },
+      filter: (mutation) => ['setUser'].includes(mutation.type)
+    }),
+  ]
 });

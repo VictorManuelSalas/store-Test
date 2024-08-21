@@ -170,10 +170,8 @@ export default {
     },
   },
   watch: {
-    selectedOption(item) {
-      console.log("test", item);
-      if (item !== null) {
-        console.log("calculando");
+    selectedOption(item) { 
+      if (item !== null) { 
         this.items[item].name === "Logout" ? (this.dialog = true) : null;
       }
     },
@@ -195,10 +193,7 @@ export default {
       // Ajusta estos valores según tus necesidades
       this.isLaptopOrPc = width >= 1024;
       this.isTabletOrMobile = width < 1024;
-    },
-    test(){
-      console.log('testinggg')
-    }
+    } 
   },
   beforeDestroy() {
     window.removeEventListener("resize", this.handleResize);

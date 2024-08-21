@@ -219,7 +219,7 @@ export default {
       }, 4000);
     },
     async getCustomers() {
-      console.log("obteniendo usuarios...");
+      // console.log("obteniendo usuarios...");
       let customersResponse = await getAllCustomers();
       if (customersResponse) {
 
@@ -236,20 +236,22 @@ export default {
           (item) => item.archived === true //&& item.id !== this.user.id
         );
       }
-      console.log(customersResponse);
+      // console.log(customersResponse);
     },
 
     async deleteCustomer() {
       this.deleteLoader = true;
       const emailLoginUser = this.$store.getters.getUser.email;
       const { item } = this.dialogAttribute;
-      item.email === emailLoginUser
-        ? console.log(" no se puede eliminar ")
-        : null;
+      if (item.email === emailLoginUser) {
+        this.alertProcess("You cannot delete this customer.", "error");
+        return
+      }
+
       const imgDelete = typeof item.avatar === "string" ? item.avatar : false;
       const { auth } = this.$store.getters.getUser;
       const response = await deleteUser(item.id, imgDelete, auth.token);
-      console.log("eliminar => ", response);
+      // console.log("eliminar => ", response);
 
       if ("message" in response && response.message == 403) {
         this.refreshAndSaveToken(auth, "delete");
@@ -277,7 +279,7 @@ export default {
         false,
         "archive"
       );
-      console.log(archivedStatus);
+      // console.log(archivedStatus);
       if (archivedStatus.status === 200) {
         this.dialogAttribute.hidde = true;
         this.getCustomers();
@@ -288,14 +290,14 @@ export default {
     },
 
     async unarchiveCustomer(id) {
-      console.log("desarchivar", id);
+      // console.log("desarchivar", id);
       const archivedStatus = await updateUser(
         id,
         { archived: false },
         false,
         "archive"
       );
-      console.log(archivedStatus);
+      // console.log(archivedStatus);
       if (archivedStatus.status === 200) {
         this.dialogAttribute.hidde = true;
         this.getCustomers();
@@ -303,10 +305,10 @@ export default {
     },
 
     async getCustomersOdoo() {
-      console.log("obteniendo customers de odoo...");
+      // console.log("obteniendo customers de odoo...");
       const { auth } = this.user;
       const data = await getAllCustomersOdoo(auth.token);
-      console.log(data);
+      // console.log(data);
       if ("message" in data && data.message == 403) {
         this.refreshAndSaveToken(auth, "odoo");
         return;
@@ -314,7 +316,7 @@ export default {
       if (data.length > 0) {
         this.$store.dispatch("fetchCustomersOdoo", data);
         this.adminOptionsEnabled = !this.adminOptionsEnabled;
-        console.log(this.$store.getters.getCustomersOdoo);
+        // console.log(this.$store.getters.getCustomersOdoo);
       }
       this.loadingOdooCustomers = false;
     },
@@ -342,8 +344,8 @@ div {
   gap: 25px;
   padding: 20px;
 
-  #title-view {    
-    display: flex; 
+  #title-view {
+    display: flex;
     padding: 0%;
     justify-content: space-between;
     flex-direction: row-reverse;
@@ -356,9 +358,9 @@ div {
         font-size: 2rem;
 
         #btn {
-          width: fit-content; 
+          width: fit-content;
         }
-      } 
+      }
     }
 
 
@@ -425,11 +427,13 @@ div {
 
 @media only screen and (max-width: 350px) {
   #title-view {
-    display: flex; 
-    flex-direction: column-reverse !important; 
+    display: flex;
+    flex-direction: column-reverse !important;
+
     section {
       width: 100%;
       text-align: center;
+
       #btn {
         width: 100% !important;
         margin-left: auto;

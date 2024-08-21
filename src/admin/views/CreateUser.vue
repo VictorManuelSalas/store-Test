@@ -154,7 +154,7 @@ export default {
       };
     }
   },
-  mounted() { console.log(this.$store.getters.getCustomersOdoo) },
+  mounted() {   },
   methods: {
     customFilterCustomers(item, queryText, itemText) {
       const name = item.name.toString().toLowerCase()
@@ -207,20 +207,21 @@ export default {
       const responseCredentialsAuthCreated = await this.createUserAuth(
         this.data
       );
-      console.log(
-        "responseCredentialsAuthCreated=> ,",
-        responseCredentialsAuthCreated
-      );
+      // console.log(
+      //   "responseCredentialsAuthCreated=> ,",
+      //   responseCredentialsAuthCreated
+      // );
       if (responseCredentialsAuthCreated) {
-        this.data = {
-          accountID: null,
-          firstname: "",
-          lastname: "",
-          role: "",
-          email: "",
-          phoneNumber: "",
-          avatar: [],
-        };
+        setTimeout(() => { this.$router.back(); }, 2000)
+        // this.data = {
+        //   accountID: null,
+        //   firstname: "",
+        //   lastname: "",
+        //   role: "",
+        //   email: "",
+        //   phoneNumber: "",
+        //   avatar: [],
+        // };
       }
       this.loading = false;
     },
@@ -234,7 +235,7 @@ export default {
         },
         auth.token
       );
-      console.log(createUserAuthsAndPerfile);
+      // console.log(createUserAuthsAndPerfile);
 
       if (
         "message" in createUserAuthsAndPerfile &&

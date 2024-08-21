@@ -230,14 +230,7 @@ export default {
 
       return password;
     },
-    // async notifyAdmins() {
-    //   console.log(await getAdmins());
-
-    //   this.alert = {
-    //     value: true,
-    //     text: "User created successfully, login password will be sent to email.",
-    //   };
-    // },
+    
   },
 };
 </script>

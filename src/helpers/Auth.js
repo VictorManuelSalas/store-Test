@@ -15,7 +15,7 @@ const axios = require("axios");
 //Backend Functions
 const registerUserAndSendCredentials = async (data, token) => {
   try {
-    console.log(data, token);
+    // console.log(data, token);
     const resp = await axios
       .post(
         `${process.env.VUE_APP_Firebase_URL_API}/api/v1/customers/new`,
@@ -27,11 +27,11 @@ const registerUserAndSendCredentials = async (data, token) => {
         }
       )
       .then((response) => {
-        console.log("respuesta", response.data);
+        // console.log("respuesta", response.data);
         return response.data;
       })
       .catch((error) => {
-        console.log("respuesta", error.response.status);
+        // console.log("respuesta", error.response.status);
         if (error.response.status === 403) {
           throw new Error(403);
         }
@@ -43,7 +43,7 @@ const registerUserAndSendCredentials = async (data, token) => {
     }
     return resp.body;
   } catch (error) {
-    console.log("Error: ", error);
+    console.error("Error: ", error);
     return error;
   }
 };
@@ -65,12 +65,11 @@ const verifyEmail = async (customer) => {
           },
         }
       )
-      .then((response) => {
-        console.log("respuesta", response.data);
+      .then((response) => { 
         return response.data;
       })
       .catch((error) => {
-        console.log("respuesta", error.response.status);
+        console.error("respuesta", error.response.status);
         if (error.response.status === 403) {
           throw new Error(error.response.data);
         }
@@ -82,7 +81,7 @@ const verifyEmail = async (customer) => {
     }
     return resp;
   } catch (error) {
-    console.log("Error: ", error);
+    console.error("Error: ", error);
     return error;
   }
 };
@@ -99,12 +98,11 @@ const changePasswordUser = async (user, auth) => {
           },
         }
       )
-      .then((response) => {
-        console.log("respuesta", response.data);
+      .then((response) => { 
         return response.data;
       })
       .catch((error) => {
-        console.log("respuesta", error.response.status);
+        console.error("respuesta", error.response.status);
         if (error.response.status === 403) {
           throw new Error(403);
         }
@@ -136,6 +134,7 @@ const logIn = async (email, password) => {
 const logOut = async () => {
   return await signOut(auth)
     .then(() => {
+      console.log('Log out success')
       return 200;
     })
     .catch((error) => {
@@ -147,14 +146,14 @@ const logOut = async () => {
 const handleResetPassword = async (actionCode, newPassword) => {
   return await verifyPasswordResetCode(auth, actionCode)
     .then((email) => {
-      const accountEmail = email;
-      console.log(accountEmail);
+      // const accountEmail = email;
+      // console.log(accountEmail);
       confirmPasswordReset(auth, actionCode, newPassword)
         .then((resp) => {
           return resp;
         })
         .catch((error) => {
-          console.log(error);
+          // console.log(error);
           return error;
         });
     })
@@ -169,7 +168,7 @@ const handleVerifyEmail = async (actionCode) => {
       return resp;
     })
     .catch((error) => {
-      console.log(error);
+      // console.log(error);
       return error;
     });
 };
@@ -194,7 +193,7 @@ const refreshToken = async (auth) => {
         }
       )
       .then((response) => {
-        console.log("Response data:", response.data);
+        // console.log("Response data:", response.data);
         return response.data;
       })
       .catch((error) => {

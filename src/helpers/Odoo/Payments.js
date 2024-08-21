@@ -2,10 +2,10 @@ const axios = require("axios");
 
 const getPaymentsUser = async (usersId, token) => {
   try {
-    console.log(
-      `${process.env.VUE_APP_Firebase_URL_API}/api/v1/odoo/getPayments/${usersId}`,
-      `Bearer ${token}`
-    );
+    // console.log(
+    //   `${process.env.VUE_APP_Firebase_URL_API}/api/v1/odoo/getPayments/${usersId}`,
+    //   `Bearer ${token}`
+    // );
     const resp = await axios
       .get(
         `${process.env.VUE_APP_Firebase_URL_API}/api/v1/odoo/getPayments/${usersId}`,
@@ -16,11 +16,11 @@ const getPaymentsUser = async (usersId, token) => {
         }
       )
       .then((response) => {
-        console.log("respuesta", response);
+        // console.log("respuesta", response);
         return response.data;
       })
       .catch((error) => {
-        console.log("respuesta", error.response.status);
+        console.error("error=> ", error.response.status);
         if (error.response.status === 403) {
           throw new Error(403);
         }

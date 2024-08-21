@@ -1,7 +1,7 @@
 <template>
   <div>
-    <v-alert max-width="400" class="mx-auto" type="error" :value="alert.value" icon="mdi-security"
-      transition="scale-transition">
+    <v-alert max-width="400" class="mx-auto" :type="alert.method === 'error' ? 'error' : 'warning'" :value="alert.value"
+      :icon="alert.method === 'error' ? 'mdi-security' : 'mdi-information'" transition="scale-transition">
       {{ alert.text }}
     </v-alert>
 
@@ -59,7 +59,7 @@
 </template>
 
 <script>
-import { logIn } from "../helpers/Auth";
+import { logIn, logOut } from "../helpers/Auth";
 import { getUserByEmail } from "../helpers/UserQuery";
 export default {
   data: () => ({
@@ -70,6 +70,7 @@ export default {
     alert: {
       value: false,
       text: "",
+      method: ""
     },
     password: "",
     passwordRules: [
@@ -89,21 +90,18 @@ export default {
 
       if (loginResponse === "Firebase: Error (auth/invalid-credential).") {
         this.loading = false;
-        this.alert = {
-          value: true,
-          text: "Incorrect password or email, please try again.",
-        };
-
-        setTimeout(() => {
-          this.alert = {
-            value: false,
-            text: "",
-          };
-        }, 5000);
+        this.alertProcess("Incorrect password or email, please try again.")
         return;
       }
       const user = await this.getUserInfo(loginResponse?.email);
       if (user) {
+        this.loading = false;
+        if (user.archived) {
+          await logOut()
+          this.alertProcess("Account Disabled, Please Contact Support", 'warning')
+          return
+        }
+
         this.$store.dispatch("fetchUser", {
           auth: {
             api_key: loginResponse.auth.config.apiKey,
@@ -114,33 +112,48 @@ export default {
           },
           ...user,
         });
-        console.log({
-          auth: {
-            api_key: loginResponse.auth.config.apiKey,
-            token: loginResponse.stsTokenManager.accessToken,
-            refreshToken: loginResponse.stsTokenManager.refreshToken,
-            account_verified: loginResponse.emailVerified,
-            passwordDefaultChanged: await this.passwordVerify(loginResponse.reloadUserInfo)
-          },
-          ...user,
-        })
-        this.$store.dispatch("updateItems", user.role);
-        this.loading = false;
+
+        // console.table({
+        //   auth: {
+        //     api_key: loginResponse.auth.config.apiKey,
+        //     token: loginResponse.stsTokenManager.accessToken,
+        //     refreshToken: loginResponse.stsTokenManager.refreshToken,
+        //     account_verified: loginResponse.emailVerified,
+        //     passwordDefaultChanged: await this.passwordVerify(loginResponse.reloadUserInfo)
+        //   },
+        //   ...user,
+        // })
+        // this.$store.dispatch("updateItems", user.role);
         this.$router.push("/home");
+        return
       }
     },
+
     async getUserInfo(email) {
       const userData = await getUserByEmail(email);
       if (userData.length === 0) {
         this.loading = false;
-        this.alert = {
-          value: true,
-          text: "User not found, please verify the information",
-        };
+        this.alertProcess("User not found, please verify the information")
         return null;
       }
       return userData[0];
     },
+
+    alertProcess(text, method = 'error') {
+      this.alert = {
+        value: true,
+        text,
+        method
+      };
+
+      setTimeout(() => {
+        this.alert = {
+          value: false,
+          text: "",
+        };
+      }, 5000);
+    },
+
     async passwordVerify(reloadUserInfo) {
       const { createdAt, passwordUpdatedAt } = reloadUserInfo;
 
@@ -152,7 +165,7 @@ export default {
 
       const areEqual = createdAt_date.getTime() !== passwordUpdatedAt_date.getTime();
 
-      console.log({ createdAt_date, passwordUpdatedAt_date, test: areEqual });
+      // console.log({ createdAt_date, passwordUpdatedAt_date, test: areEqual });
       return areEqual;
     }
   },

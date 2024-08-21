@@ -160,6 +160,8 @@ export default {
           sortable: true,
           align: "center",
         },
+        // { text: "Token", value: "access_token", sortable: false, align: "center" },
+        // { text: "url", value: "access_url", sortable: false, align: "center" },
         { text: "Actions", value: "actions", sortable: false, align: "center" },
       ];
     },
@@ -215,9 +217,8 @@ export default {
             invoice.payment_state === "in_payment" || invoice.payment_state === "paid"
               ? "Paid" : invoice.payment_state === "not_paid" ? "Not Paid" : invoice.payment_state;
           return { ...invoice, payment_state };
-        });
- 
-        this.$store.dispatch("fetchInvoices", invoices);
+        }); 
+        this.$store.dispatch("fetchInvoices", this.invoices);
         this.invoicesProccessSearch = false;
         return;
       } else if (invoices.length === 0) {

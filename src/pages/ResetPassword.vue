@@ -111,8 +111,10 @@
                   @click:append="show1 = !show1"></v-text-field>
               </v-col>
               <v-col cols="12" md="12" ms="4">
-                <v-text-field v-model="passwordData.verificationPassword" type="text" name="Verification Password"
-                  label="Verification Password" hint="At least 8 characters" counter filled></v-text-field>
+                <v-text-field v-model="passwordData.verificationPassword" :rules="passwordRule"
+                  :append-icon="show2 ? 'mdi-eye' : 'mdi-eye-off'" :type="show2 ? 'text' : 'password'"
+                  name="Verification Password" label="Verification Password" hint="At least 8 characters" counter filled
+                  @click:append="show2 = !show2"></v-text-field>
               </v-col>
             </v-row>
           </v-container>
@@ -193,6 +195,7 @@ import { handleVerifyEmail } from "../helpers/Auth";
 export default {
   data: () => ({
     show1: false,
+    show2: false,
     loading: false,
     selection: 1,
     alert: {

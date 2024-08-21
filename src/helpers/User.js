@@ -48,7 +48,7 @@ const createUser = async (data) => {
 const updateUser = async (id, data, imgChanged, proccess) => {
   try {
     if (proccess !== "archive") {
-      console.log("esta es la data que recibo ", data);
+      // console.log("esta es la data que recibo ", data);
       imgChanged ? await deleteImage(imgChanged) : null;
       if (
         data.avatar !== null &&
@@ -63,7 +63,7 @@ const updateUser = async (id, data, imgChanged, proccess) => {
             console.error("Upload failed:", error);
           });
       }
-      console.log(data);
+      // console.log(data);
 
       if (data.avatar == null) {
         data.avatar = [];
@@ -75,7 +75,7 @@ const updateUser = async (id, data, imgChanged, proccess) => {
       { ...data, modifiedAt: Timestamp.fromDate(new Date()) },
       { merge: true }
     );
-    console.log("update user", docRef);
+    // console.log("update user", docRef);
     return { status: 200, customer: data };
   } catch (e) {
     console.error("Error update document: ", e);
@@ -86,7 +86,7 @@ const updateUser = async (id, data, imgChanged, proccess) => {
 //delete User
 const deleteUser = async (id, imgDelete, token) => {
   try {
-    console.log("imgDelete", imgDelete);
+    // console.log("imgDelete", imgDelete);
     imgDelete ? await deleteImage(imgDelete) : null;
 
     const resp = await axios
@@ -99,11 +99,11 @@ const deleteUser = async (id, imgDelete, token) => {
         }
       )
       .then((response) => {
-        console.log("respuesta", response);
+        // console.log("respuesta", response);
         return response.data;
       })
       .catch((error) => {
-        console.log("respuesta", error.response.status);
+        console.error("respuesta", error.response.status);
         if (error.response.status === 403) {
           throw new Error(403);
         }
@@ -115,7 +115,7 @@ const deleteUser = async (id, imgDelete, token) => {
     }
     return resp.body;
   } catch (error) {
-    console.log("Error: ", error);
+    console.error("Error: ", error);
     return error;
   }
 };
@@ -139,10 +139,10 @@ const uploadImage = async (file) => {
         reject(error);
       },
       async () => {
-        console.log("Image uploaded successfully!");
+        // console.log("Image uploaded successfully!");
         try {
           const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          console.log("File available at", downloadURL);
+          // console.log("File available at", downloadURL);
           resolve(downloadURL);
         } catch (error) {
           console.error("Error getting download URL:", error);
@@ -156,7 +156,7 @@ const uploadImage = async (file) => {
 const deleteImage = async (img) => {
   try {
     const storage = getStorage();
-    console.log("se debe de borrar ", img);
+    // console.log("se debe de borrar ", img);
     const regex = /\/o\/(.*?)\?/;
     const match = img.match(regex);
     if (match) {
@@ -164,10 +164,10 @@ const deleteImage = async (img) => {
         storage,
         match[1].replace(/%2F/g, "/").replace(/%20/g, " ")
       );
-      console.log("ref", desertRef);
+      // console.log("ref", desertRef);
       return await deleteObject(desertRef)
         .then(() => {
-          console.log("se elimino");
+          // console.log("se elimino");
           return 200;
         })
         .catch((error) => {
@@ -175,7 +175,7 @@ const deleteImage = async (img) => {
         });
     }
   } catch (error) {
-    console.log(error);
+    console.error(error);
     return error;
   }
 };

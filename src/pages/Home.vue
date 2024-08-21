@@ -128,16 +128,14 @@ export default {
   },
   methods: {
 
-    alertProcess(message) {
-      console.log(message)
+    alertProcess(message) { 
       this.$refs.changePassword.dialog = false;
       this.alert = {
         value: true,
         text: message.text,
         method: message.method,
       };
-
-      console.log('tets', this.verifyAccountOptions, message.method === 'info')
+ 
       if (message.method === 'info') {
         this.$refs.headerFunctions.loginOut();
         // this.disableFuncions = false
@@ -172,10 +170,9 @@ export default {
 
     },
     async verifyAccount() {
-      this.loading = true;
-      console.log(this.user);
+      this.loading = true; 
       const statusSendEmail = await verifyEmail(this.user);
-      console.log(statusSendEmail);
+      // console.log(statusSendEmail);
       if (statusSendEmail.status === 200) {
         this.verifyAccountOptions.shift()
         this.verifyAccountOptions.unshift({
@@ -193,9 +190,7 @@ export default {
     },
 
 
-    alertStructureBuild() {
-      console.log(this.user.auth.account_verified)
-      console.log(this.user.auth.passwordDefaultChanged);
+    alertStructureBuild() { 
 
       !this.user.auth.passwordDefaultChanged ? (this.verifyAccountOptions.push({
         name: 'passwordNotChanged',
