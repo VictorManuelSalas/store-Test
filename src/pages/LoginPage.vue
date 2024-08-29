@@ -112,6 +112,7 @@ export default {
           },
           ...user,
         });
+        // console.log(loginResponse.stsTokenManager.accessToken);
 
         // console.table({
         //   auth: {
